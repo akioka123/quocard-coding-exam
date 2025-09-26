@@ -1,0 +1,85 @@
+plugins {
+	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+	id 'org.springframework.boot' version '3.5.6'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.jooq.jooq-codegen-gradle' version '3.19.26'
+}
+
+group = 'com.example'
+version = '0.0.1-SNAPSHOT'
+description = 'quocard coding exam'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-jooq'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	implementation 'org.jetbrains.kotlin:kotlin-reflect'
+	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+jooq {
+	configuration {
+
+  // Configure the database connection here
+  jdbc {
+    driver = "oracle.jdbc.OracleDriver"
+    url = "jdbc:oracle:thin:@[your jdbc connection parameters]"
+    user = "[your database user]"
+    password = "[your database password]"
+
+    // You can also pass user/password and other JDBC properties in the optional properties tag:
+    properties {
+      property {
+        key = "user"
+        value = "[db-user]"
+      }
+      property {
+        key = "password"
+        value = "[db-password]"
+      }
+    }
+  }
+  generator {
+    database {
+      name = "org.jooq.meta.postgresql.PostgreSQLDatabase"
+
+      includes = ".*"
+
+      excludes = ""
+
+      inputSchema = "public"
+    }
+
+    generate {}
+    target {
+      packageName = "com.example.book_management"
+      directory = "src/main/java/com/example/book_management"
+    }
+  }
+}
+}
+
+kotlin {
+	compilerOptions {
+		freeCompilerArgs.addAll '-Xjsr305=strict'
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

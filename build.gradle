@@ -28,6 +28,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-jooq'
     implementation 'org.flywaydb:flyway-database-postgresql'
     implementation 'org.flywaydb:flyway-core'
@@ -37,6 +38,8 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    jooqCodegen 'org.postgresql:postgresql'
 }
 
 jooq {
@@ -49,9 +52,10 @@ jooq {
             user = "api"
             password = "Api!!1234"
         }
+
         generator {
             database {
-                name = "org.jooq.meta.postgresql.PostgreSQLDatabase"
+                name = "org.jooq.meta.postgres.PostgresDatabase"
 
                 includes = ".*"
 
@@ -63,7 +67,7 @@ jooq {
             generate {}
             target {
                 packageName = "com.example.book_management"
-                directory = "src/main/java/com/example/book_management"
+                directory = "src/generated/jooq"
             }
         }
     }
@@ -76,6 +80,7 @@ flyway {
     password = "Admin!!1234"
     schemas = ['dev']
     locations = ['classpath:db/migrations']
+    cleanDisabled = false
 }
 
 kotlin {

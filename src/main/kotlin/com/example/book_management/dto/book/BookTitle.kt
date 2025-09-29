@@ -1,10 +1,14 @@
 package com.example.book_management.dto.book
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
+
 /**
  * 書籍タイトルを表す値オブジェクト
  */
 @JvmInline
-value class BookTitle(val value: String) {
+value class BookTitle @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+constructor(@get:JsonValue val value: String) {
     init {
         require(value.isNotBlank()) { "書籍タイトルは空白にできません。" }
     }

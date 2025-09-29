@@ -49,11 +49,12 @@ jooq {
         jdbc {
             driver = "org.postgresql.Driver"
             url = "jdbc:postgresql://localhost:5432/book_management"
-            user = "api"
-            password = "Api!!1234"
+            user = "app_admin"
+            password = "Admin!!1234"
         }
 
         generator {
+            name = "org.jooq.codegen.KotlinGenerator"
             database {
                 name = "org.jooq.meta.postgres.PostgresDatabase"
 
@@ -67,10 +68,14 @@ jooq {
             generate {}
             target {
                 packageName = "com.example.book_management"
-                directory = "src/generated/jooq"
+                directory = "build/generated/sources/jooq"
             }
         }
     }
+}
+
+sourceSets {
+    main { kotlin.srcDirs += "build/generated/sources/jooq" }
 }
 
 flyway {

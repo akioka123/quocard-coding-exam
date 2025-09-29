@@ -1,12 +1,15 @@
 package com.example.book_management.dto.book
 
+import com.fasterxml.jackson.annotation.JsonCreator
+import com.fasterxml.jackson.annotation.JsonValue
 import java.math.BigDecimal
 
 /**
  * 価格を表す値オブジェクト
  */
 @JvmInline
-value class BookPrice(val value: BigDecimal) {
+value class BookPrice @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+constructor(@get:JsonValue val value: BigDecimal) {
     init {
         require(value >= BigDecimal.ZERO) { "価格は0以上でなければなりません。" }
     }

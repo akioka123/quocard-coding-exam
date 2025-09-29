@@ -1,6 +1,6 @@
 package com.example.book_management.dto.author
 
-import com.example.book_management.dto.book.CreateBookRequest
+import com.example.book_management.dto.book.CreateBookWithAuthorRequest
 
 
 /**
@@ -9,5 +9,5 @@ import com.example.book_management.dto.book.CreateBookRequest
 data class CreateAuthorRequest(
     val name: AuthorName,
     val birthDate: BirthDate,
-    val books: List<CreateBookRequest>
+    val books: List<CreateBookWithAuthorRequest>
 )

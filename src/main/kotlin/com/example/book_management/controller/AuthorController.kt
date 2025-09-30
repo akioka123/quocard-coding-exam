@@ -55,7 +55,9 @@ class AuthorController(
                 it.title,
                 it.bookPrice,
                 listOf(authorId),
-                it.publicationStatus
+                it.publicationStatus,
+                LocalDateTime.now(),
+                LocalDateTime.now()
             )
         }
 

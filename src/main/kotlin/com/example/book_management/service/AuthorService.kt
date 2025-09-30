@@ -24,7 +24,7 @@ class AuthorService(
         }
 
         authorRepo.insert(author.id, author.name, author.birthDate)
-        bookRepo.insert(books)
+        bookRepo.insertMany(books)
         bookAuthorsRepo.insertAuthorBooks(author.id, books.map { it.id })
     }
 

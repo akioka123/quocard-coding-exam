@@ -21,15 +21,15 @@ class GlobalExceptionHandler {
      */
     @ExceptionHandler(MethodArgumentNotValidException::class)
     fun handleValidationException(ex: MethodArgumentNotValidException): ResponseEntity<ErrorResponse> {
-        val errorMessage = ex.bindingResult.fieldErrors.joinToString(", ") { 
-            "${it.field}: ${it.defaultMessage}" 
+        val errorMessage = ex.bindingResult.fieldErrors.joinToString(", ") {
+            "${it.field}: ${it.defaultMessage}"
         }
-        
+
         val response = ErrorResponse(
             statusCode = HttpStatus.BAD_REQUEST,
             errorMessage = errorMessage
         )
-        
+
         return ResponseEntity.badRequest().body(response)
     }
 
@@ -42,7 +42,20 @@ class GlobalExceptionHandler {
             statusCode = HttpStatus.BAD_REQUEST,
             errorMessage = ex.message ?: "無効なリクエストです"
         )
-        
+
+        return ResponseEntity.badRequest().body(response)
+    }
+
+    /**
+     * IllegalStateException（400 Bad Request）
+     */
+    @ExceptionHandler(IllegalStateException::class)
+    fun handleIllegalStateException(ex: IllegalStateException): ResponseEntity<ErrorResponse> {
+        val response = ErrorResponse(
+            statusCode = HttpStatus.BAD_REQUEST,
+            errorMessage = ex.message ?: "無効な状態のパラメータが存在します"
+        )
+
         return ResponseEntity.badRequest().body(response)
     }
 
@@ -60,12 +73,14 @@ class GlobalExceptionHandler {
      * 楽観排他制御エラー（409 Conflict）
      */
     @ExceptionHandler(OptimisticLockingFailureException::class)
-    fun handleOptimisticLockingFailureException(ex: OptimisticLockingFailureException): ResponseEntity<ErrorResponse> {
+    fun handleOptimisticLockingFailureException(
+        ex: OptimisticLockingFailureException
+    ): ResponseEntity<ErrorResponse> {
         val response = ErrorResponse(
             statusCode = HttpStatus.CONFLICT,
             errorMessage = ex.message ?: "楽観排他制御エラーが発生しました"
         )
-        
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response)
     }
 
@@ -78,7 +93,7 @@ class GlobalExceptionHandler {
             statusCode = HttpStatus.INTERNAL_SERVER_ERROR,
             errorMessage = "内部サーバーエラーが発生しました"
         )
-        
+
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response)
     }
 }

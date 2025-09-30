@@ -1,10 +1,13 @@
 package com.example.book_management.repository
 
-import org.jooq.impl.DSL.row
-import com.example.book_management.dto.book.Book
+import com.example.book_management.dto.author.AuthorId
+import com.example.book_management.dto.book.*
 import com.example.book_management.tables.references.BOOKS
+import com.example.book_management.tables.references.BOOK_AUTHORS
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.row
 import org.springframework.stereotype.Repository
+import java.time.LocalDateTime
 
 /**
  * 書籍リポジトリインターフェース
@@ -13,35 +16,75 @@ import org.springframework.stereotype.Repository
 @Repository
 class BookRepository(private val dsl: DSLContext) {
     /**
-     * 書籍を保存する
+     * 複数の書籍を保存する
      */
-    fun insert(books: List<Book>) {
+    fun insertMany(books: List<Book>) {
         val bookEntities = books.map {
             row(
-                it.id.value,
-                it.title.value,
-                it.bookPrice.value,
-                it.publicationStatus.name
+                it.id.value, it.title.value, it.bookPrice.value, it.publicationStatus.name
             )
         }
 
         dsl.insertInto(
-            BOOKS,
-            BOOKS.ID,
-            BOOKS.TITLE,
-            BOOKS.PRICE,
-            BOOKS.PUBLICATION_STATUS
-        )
-            .valuesOfRows(bookEntities)
+            BOOKS, BOOKS.ID, BOOKS.TITLE, BOOKS.PRICE, BOOKS.PUBLICATION_STATUS
+        ).valuesOfRows(bookEntities).execute()
+    }
+
+    /**
+     * 書籍を保存する
+     */
+    fun insert(book: Book) {
+        dsl.insertInto(BOOKS)
+            .set(BOOKS.ID, book.id.value)
+            .set(BOOKS.TITLE, book.title.value)
+            .set(BOOKS.PRICE, book.bookPrice.value)
+            .set(BOOKS.PUBLICATION_STATUS, book.publicationStatus.value)
             .execute()
     }
 
+    fun existsByTitleAndPrice(book: Book): Boolean {
+        return dsl.fetchExists(
+            BOOKS,
+            BOOKS.TITLE.eq(book.title.value).and(BOOKS.PRICE.eq(book.bookPrice.value))
+        )
+    }
 
-//        dsl.insertInto(BOOKS)
-//            .set(BOOKS.ID, book.id.value)
-//            .set(BOOKS.TITLE, book.title.value)
-//            .set(BOOKS.PRICE, book.bookPrice.value)
-//            .set(BOOKS.PUBLICATION_STATUS, book.publicationStatus.name)
+    /**
+     * 書籍を取得する
+     */
+    fun findById(id: BookId): Book? {
+        val bookRecord = dsl.selectFrom(BOOKS)
+            .where(BOOKS.ID.eq(id.value))
+            .fetchOne() ?: return null
+
+        val authorIds = dsl
+            .select(BOOK_AUTHORS.AUTHOR_ID)
+            .from(BOOK_AUTHORS)
+            .where(BOOK_AUTHORS.BOOK_ID.eq(id.value))
+            .fetch()
+            .map { it.value1()?.let { value -> AuthorId(value) } }
+
+        return Book.fromRecord(bookRecord, authorIds)
+    }
+
+    /**
+     * 書籍を更新する（楽観排他制御付き）
+     */
+    fun update(
+        id: BookId,
+        title: BookTitle,
+        bookPrice: BookPrice,
+        publicationStatus: PublicationStatus,
+        expectedUpdatedAt: LocalDateTime
+    ): Int =
+        dsl.update(BOOKS)
+            .set(BOOKS.TITLE, title.value)
+            .set(BOOKS.PRICE, bookPrice.value)
+            .set(BOOKS.PUBLICATION_STATUS, publicationStatus.value)
+            .set(BOOKS.UPDATED_AT, LocalDateTime.now())
+            .where(BOOKS.ID.eq(id.value))
+            .and(BOOKS.UPDATED_AT.eq(expectedUpdatedAt))
+            .execute()
 
     /**
      * 著者IDで書籍を検索する

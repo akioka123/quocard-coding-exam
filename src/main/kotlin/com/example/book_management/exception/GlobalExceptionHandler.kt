@@ -4,6 +4,7 @@ import com.example.book_management.dto.response.ErrorResponse
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
@@ -52,6 +53,19 @@ class GlobalExceptionHandler {
             errorMessage = ex.message ?: "重複しています"
         )
 
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response)
+    }
+
+    /**
+     * 楽観排他制御エラー（409 Conflict）
+     */
+    @ExceptionHandler(OptimisticLockingFailureException::class)
+    fun handleOptimisticLockingFailureException(ex: OptimisticLockingFailureException): ResponseEntity<ErrorResponse> {
+        val response = ErrorResponse(
+            statusCode = HttpStatus.CONFLICT,
+            errorMessage = ex.message ?: "楽観排他制御エラーが発生しました"
+        )
+        
         return ResponseEntity.status(HttpStatus.CONFLICT).body(response)
     }
 

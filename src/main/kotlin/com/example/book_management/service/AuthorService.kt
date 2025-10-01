@@ -15,7 +15,8 @@ class AuthorService(
     private val authorRepo: AuthorRepository,
     private val bookRepo: BookRepository,
     private val bookAuthorsRepo: BookAuthorsRepository,
-    private val authorDomainService: AuthorDomainService
+    private val authorDomainService: AuthorDomainService,
+    private val bookDomainService: BookDomainService
 ) {
     @Transactional
     fun insert(author: Author, books: List<Book>) {
@@ -24,7 +25,12 @@ class AuthorService(
         }
 
         authorRepo.insert(author.id, author.name, author.birthDate)
-        bookRepo.insertMany(books)
+
+        val notRegisteredBooks = books.filter {
+            !bookDomainService.isDuplicateBook(it)
+        }
+
+        bookRepo.insertMany(notRegisteredBooks)
         bookAuthorsRepo.insertAuthorBooks(author.id, books.map { it.id })
     }
 

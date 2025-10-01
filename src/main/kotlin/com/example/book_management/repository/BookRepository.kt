@@ -62,7 +62,7 @@ class BookRepository(private val dsl: DSLContext) {
             .from(BOOK_AUTHORS)
             .where(BOOK_AUTHORS.BOOK_ID.eq(id.value))
             .fetch()
-            .map { it.value1()?.let { value -> AuthorId(value) } }
+            .mapNotNull { it.value1()?.let { value -> AuthorId(value) } }
 
         return Book.fromRecord(bookRecord, authorIds)
     }
@@ -110,7 +110,7 @@ class BookRepository(private val dsl: DSLContext) {
                 .from(BOOK_AUTHORS)
                 .where(BOOK_AUTHORS.BOOK_ID.eq(bookRecord.id))
                 .fetch()
-                .map { it.value1()?.let { value -> AuthorId(value) } }
+                .mapNotNull { it.value1()?.let { value -> AuthorId(value) } }
 
             Book.fromRecord(bookRecord, bookAuthorIds)
         }

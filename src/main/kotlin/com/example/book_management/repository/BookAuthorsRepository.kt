@@ -4,20 +4,20 @@ import com.example.book_management.dto.author.AuthorId
 import com.example.book_management.dto.book.BookId
 import com.example.book_management.tables.references.BOOK_AUTHORS
 import org.jooq.DSLContext
-import org.springframework.stereotype.Repository
 import org.jooq.impl.DSL.row
+import org.springframework.stereotype.Repository
 
 @Repository
 class BookAuthorsRepository(private val dsl: DSLContext) {
     fun insertAuthorBooks(authorId: AuthorId, bookIds: List<BookId>) {
-        val bookAuthorsEntity = bookIds.map {
+        val bookAuthorsRows = bookIds.map {
             row(it.value, authorId.value)
         }
         dsl.insertInto(
             BOOK_AUTHORS,
             BOOK_AUTHORS.BOOK_ID,
             BOOK_AUTHORS.AUTHOR_ID
-        ).valuesOfRows(bookAuthorsEntity)
+        ).valuesOfRows(bookAuthorsRows)
             .execute()
     }
 
@@ -42,7 +42,7 @@ class BookAuthorsRepository(private val dsl: DSLContext) {
         dsl.deleteFrom(BOOK_AUTHORS)
             .where(BOOK_AUTHORS.BOOK_ID.eq(bookId.value))
             .execute()
-            
+
         // 新しい著者情報を挿入
         if (authorIds.isNotEmpty()) {
             val bookAuthorsEntity = authorIds.map {

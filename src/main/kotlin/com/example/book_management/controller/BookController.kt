@@ -1,27 +1,16 @@
 package com.example.book_management.controller
 
 import com.example.book_management.dto.author.AuthorId
-import com.example.book_management.dto.book.Book
-import com.example.book_management.dto.book.BookId
-import com.example.book_management.dto.book.BookPrice
-import com.example.book_management.dto.book.BookTitle
-import com.example.book_management.dto.book.BookUpdateRequest
-import com.example.book_management.dto.book.CreateBookRequest
-import com.example.book_management.dto.book.PublicationStatus
+import com.example.book_management.dto.book.*
 import com.example.book_management.dto.response.BookCreateResponse
 import com.example.book_management.dto.response.BookUpdateResponse
 import com.example.book_management.dto.response.SuccessResponse
 import com.example.book_management.service.BookService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 /**
  * 書籍コントローラー
@@ -87,6 +76,20 @@ class BookController(
             data = BookUpdateResponse(
                 bookId = id.toString()
             )
+        )
+
+        return ResponseEntity.ok(response)
+    }
+
+    @GetMapping("/get")
+    fun findByAuthorId(
+        @RequestParam("authorId") authorId: UUID
+    ): ResponseEntity<SuccessResponse<List<Book>>> {
+        val books = bookService.findByAuthorId(AuthorId(authorId))
+
+        val response = SuccessResponse(
+            statusCode = HttpStatus.OK,
+            data = books
         )
 
         return ResponseEntity.ok(response)

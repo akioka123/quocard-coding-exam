@@ -1,5 +1,6 @@
 package com.example.book_management.service
 
+import com.example.book_management.dto.author.AuthorId
 import com.example.book_management.dto.book.Book
 import com.example.book_management.repository.BookAuthorsRepository
 import com.example.book_management.repository.BookRepository
@@ -49,5 +50,9 @@ class BookService(
 
         // その書籍に関連する中間テーブルの著者IDも更新する
         bookAuthorsRepo.updateBookAuthors(book.id, book.authors)
+    }
+
+    fun findByAuthorId(authorId: AuthorId): List<Book> {
+        return bookRepo.findAllBookByAuthorId(authorId)
     }
 }

@@ -76,8 +76,8 @@ class BookRepository(private val dsl: DSLContext) {
         bookPrice: BookPrice,
         publicationStatus: PublicationStatus,
         expectedUpdatedAt: LocalDateTime
-    ): Int =
-        dsl.update(BOOKS)
+    ): Int {
+        return dsl.update(BOOKS)
             .set(BOOKS.TITLE, title.value)
             .set(BOOKS.PRICE, bookPrice.value)
             .set(BOOKS.PUBLICATION_STATUS, publicationStatus.value)
@@ -85,9 +85,34 @@ class BookRepository(private val dsl: DSLContext) {
             .where(BOOKS.ID.eq(id.value))
             .and(BOOKS.UPDATED_AT.eq(expectedUpdatedAt))
             .execute()
+    }
 
     /**
      * 著者IDで書籍を検索する
      */
+    fun findAllBookByAuthorId(authorId: AuthorId): List<Book> {
+        val bookIds = dsl.select(BOOK_AUTHORS.BOOK_ID)
+            .from(BOOK_AUTHORS)
+            .where(BOOK_AUTHORS.AUTHOR_ID.eq(authorId.value))
+            .fetch()
+            .map { it.value1() }
 
+        if (bookIds.isEmpty()) {
+            return emptyList()
+        }
+
+        val bookRecords = dsl.selectFrom(BOOKS)
+            .where(BOOKS.ID.`in`(bookIds))
+            .fetch()
+
+        return bookRecords.map { bookRecord ->
+            val bookAuthorIds = dsl.select(BOOK_AUTHORS.AUTHOR_ID)
+                .from(BOOK_AUTHORS)
+                .where(BOOK_AUTHORS.BOOK_ID.eq(bookRecord.id))
+                .fetch()
+                .map { it.value1()?.let { value -> AuthorId(value) } }
+
+            Book.fromRecord(bookRecord, bookAuthorIds)
+        }
+    }
 }

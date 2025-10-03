@@ -11,5 +11,6 @@ value class BookTitle @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
 constructor(@get:JsonValue val value: String) {
     init {
         require(value.isNotBlank()) { "書籍タイトルは空白にできません。" }
+        require(value.length <= 100) { "書籍タイトルは100文字以内でなければなりません。" }
     }
 }

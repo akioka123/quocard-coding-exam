@@ -7,7 +7,7 @@ import java.time.LocalDateTime
 /**
  * 書籍エンティティ
  */
-class Book(
+data class Book(
     val id: BookId,
     val title: BookTitle,
     val bookPrice: BookPrice,

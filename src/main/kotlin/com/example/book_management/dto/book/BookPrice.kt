@@ -12,8 +12,9 @@ value class BookPrice @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
 constructor(@get:JsonValue val value: BigDecimal) {
     init {
         require(value >= BigDecimal.ZERO) { "価格は0以上でなければなりません。" }
+        require(value < BigDecimal("1000000000000.00")) { "価格は整数部12桁以内でなければなりません。" }
     }
-    
+
     constructor(value: Int) : this(BigDecimal(value))
     constructor(value: Long) : this(BigDecimal(value))
     constructor(value: Double) : this(BigDecimal.valueOf(value))

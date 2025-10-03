@@ -7,7 +7,7 @@ import com.example.book_management.dto.book.BookResponse
  * 登録された著者情報を返却するためのデータ転送オブジェクト
  */
 data class AuthorResponse(
-    val id: Long,
+    val id: AuthorId,
     val name: AuthorName,
     val birthDate: BirthDate,
     val books: List<BookResponse>

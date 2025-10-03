@@ -6,7 +6,7 @@ import java.time.LocalDateTime
 /**
  * 著者エンティティ
  */
-class Author(
+data class Author(
     val id: AuthorId,
     val name: AuthorName,
     val birthDate: BirthDate,

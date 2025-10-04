@@ -22,7 +22,7 @@ class BookService(
         }
 
         bookRepo.insert(book)
-        bookAuthorsRepo.insertBookAuthors(book.id, book.authors)
+        bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds)
     }
 
     @Transactional
@@ -49,7 +49,7 @@ class BookService(
         }
 
         // その書籍に関連する中間テーブルの著者IDも更新する
-        bookAuthorsRepo.updateBookAuthors(book.id, book.authors)
+        bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds)
     }
 
     fun findByAuthorId(authorId: AuthorId): List<Book> {

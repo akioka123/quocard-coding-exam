@@ -109,7 +109,7 @@ class BookDomainServiceTest {
             id = BookId(UUID.randomUUID()),
             title = BookTitle("テスト書籍"),
             bookPrice = BookPrice(1000),
-            authors = listOf(AuthorId(UUID.randomUUID())),
+            authorIds = listOf(AuthorId(UUID.randomUUID())),
             publicationStatus = PublicationStatus.PUBLISHED,
             createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
             updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -121,7 +121,7 @@ class BookDomainServiceTest {
             id = BookId(UUID.randomUUID()),
             title = BookTitle("テスト書籍"),
             bookPrice = BookPrice(1000),
-            authors = listOf(AuthorId(UUID.randomUUID())),
+            authorIds = listOf(AuthorId(UUID.randomUUID())),
             publicationStatus = PublicationStatus.PUBLISHED,
             createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
             updatedAt = LocalDateTime.of(2024, 1, 2, 0, 0)

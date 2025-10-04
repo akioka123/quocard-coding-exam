@@ -25,7 +25,7 @@ class BookTest {
             val id = BookId(UUID.randomUUID())
             val title = BookTitle("テストタイトル")
             val bookPrice = BookPrice(BigDecimal("1500"))
-            val authors = listOf(AuthorId(UUID.randomUUID()))
+            val authorIds = listOf(AuthorId(UUID.randomUUID()))
             val publicationStatus = PublicationStatus.PUBLISHED
             val createdAt = LocalDateTime.now().minusDays(1)
             val updatedAt = LocalDateTime.now()
@@ -35,7 +35,7 @@ class BookTest {
                 id = id,
                 title = title,
                 bookPrice = bookPrice,
-                authors = authors,
+                authorIds = authorIds,
                 publicationStatus = publicationStatus,
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -45,7 +45,7 @@ class BookTest {
             assertThat(book.id).isEqualTo(id)
             assertThat(book.title).isEqualTo(title)
             assertThat(book.bookPrice).isEqualTo(bookPrice)
-            assertThat(book.authors).isEqualTo(authors)
+            assertThat(book.authorIds).isEqualTo(authorIds)
             assertThat(book.publicationStatus).isEqualTo(publicationStatus)
             assertThat(book.createdAt).isEqualTo(createdAt)
             assertThat(book.updatedAt).isEqualTo(updatedAt)
@@ -58,7 +58,7 @@ class BookTest {
             val id = BookId(UUID.randomUUID())
             val title = BookTitle("テストタイトル")
             val bookPrice = BookPrice(BigDecimal("1500"))
-            val authors = listOf(
+            val authorIds = listOf(
                 AuthorId(UUID.randomUUID()),
                 AuthorId(UUID.randomUUID()),
                 AuthorId(UUID.randomUUID())
@@ -72,15 +72,15 @@ class BookTest {
                 id = id,
                 title = title,
                 bookPrice = bookPrice,
-                authors = authors,
+                authorIds = authorIds,
                 publicationStatus = publicationStatus,
                 createdAt = createdAt,
                 updatedAt = updatedAt
             )
 
             // Then
-            assertThat(book.authors).hasSize(3)
-            assertThat(book.authors).isEqualTo(authors)
+            assertThat(book.authorIds).hasSize(3)
+            assertThat(book.authorIds).isEqualTo(authorIds)
         }
 
         @Test
@@ -105,7 +105,7 @@ class BookTest {
             assertThat(book.title.value).isEqualTo("テストタイトル")
             assertThat(book.bookPrice.value).isEqualTo(BigDecimal("1500"))
             assertThat(book.publicationStatus).isEqualTo(PublicationStatus.PUBLISHED)
-            assertThat(book.authors).isEqualTo(authors)
+            assertThat(book.authorIds).isEqualTo(authors)
         }
     }
 
@@ -131,7 +131,7 @@ class BookTest {
                     id = id,
                     title = title,
                     bookPrice = bookPrice,
-                    authors = authors,
+                    authorIds = authors,
                     publicationStatus = publicationStatus,
                     createdAt = createdAt,
                     updatedAt = updatedAt
@@ -271,7 +271,7 @@ class BookTest {
                 id = id,
                 title = title,
                 bookPrice = bookPrice,
-                authors = authors,
+                authorIds = authors,
                 publicationStatus = publicationStatus,
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -280,7 +280,7 @@ class BookTest {
                 id = id,
                 title = title,
                 bookPrice = bookPrice,
-                authors = authors,
+                authorIds = authors,
                 publicationStatus = publicationStatus,
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -298,7 +298,7 @@ class BookTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("タイトル1"),
                 bookPrice = BookPrice(BigDecimal("1000")),
-                authors = listOf(AuthorId(UUID.randomUUID())),
+                authorIds = listOf(AuthorId(UUID.randomUUID())),
                 publicationStatus = PublicationStatus.PUBLISHED,
                 createdAt = LocalDateTime.now().minusDays(1),
                 updatedAt = LocalDateTime.now()
@@ -307,7 +307,7 @@ class BookTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("タイトル2"),
                 bookPrice = BookPrice(BigDecimal("2000")),
-                authors = listOf(AuthorId(UUID.randomUUID())),
+                authorIds = listOf(AuthorId(UUID.randomUUID())),
                 publicationStatus = PublicationStatus.UNPUBLISHED,
                 createdAt = LocalDateTime.now().minusDays(2),
                 updatedAt = LocalDateTime.now().minusHours(1)
@@ -324,7 +324,7 @@ class BookTest {
             val id = BookId(UUID.randomUUID())
             val title = BookTitle("テストタイトル")
             val bookPrice = BookPrice(BigDecimal("1500"))
-            val authors = listOf(AuthorId(UUID.randomUUID()))
+            val authorIds = listOf(AuthorId(UUID.randomUUID()))
             val publicationStatus = PublicationStatus.PUBLISHED
             val createdAt = LocalDateTime.now().minusDays(1)
             val updatedAt = LocalDateTime.now()
@@ -333,7 +333,7 @@ class BookTest {
                 id = id,
                 title = title,
                 bookPrice = bookPrice,
-                authors = authors,
+                authorIds = authorIds,
                 publicationStatus = publicationStatus,
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -342,7 +342,7 @@ class BookTest {
                 id = id,
                 title = title,
                 bookPrice = bookPrice,
-                authors = authors,
+                authorIds = authorIds,
                 publicationStatus = publicationStatus,
                 createdAt = createdAt,
                 updatedAt = updatedAt
@@ -360,7 +360,7 @@ class BookTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("元のタイトル"),
                 bookPrice = BookPrice(BigDecimal("1500")),
-                authors = listOf(AuthorId(UUID.randomUUID())),
+                authorIds = listOf(AuthorId(UUID.randomUUID())),
                 publicationStatus = PublicationStatus.PUBLISHED,
                 createdAt = LocalDateTime.now().minusDays(1),
                 updatedAt = LocalDateTime.now()
@@ -376,7 +376,7 @@ class BookTest {
             assertThat(copiedBook.id).isEqualTo(originalBook.id)
             assertThat(copiedBook.title.value).isEqualTo("新しいタイトル")
             assertThat(copiedBook.bookPrice.value).isEqualTo(BigDecimal("2000"))
-            assertThat(copiedBook.authors).isEqualTo(originalBook.authors)
+            assertThat(copiedBook.authorIds).isEqualTo(originalBook.authorIds)
             assertThat(copiedBook.publicationStatus).isEqualTo(originalBook.publicationStatus)
             assertThat(copiedBook.createdAt).isEqualTo(originalBook.createdAt)
             assertThat(copiedBook.updatedAt).isEqualTo(originalBook.updatedAt)

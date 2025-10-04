@@ -21,7 +21,7 @@ class AuthorDomainService(
     fun isDuplicateAuthor(name: AuthorName, birthDate: BirthDate): Boolean {
         return authorRepository.existsByNameAndBirthDate(name, birthDate)
     }
-    
+
     /**
      * 著者更新の妥当性チェック
      * ビジネスルール: 存在する著者のみ更新可能

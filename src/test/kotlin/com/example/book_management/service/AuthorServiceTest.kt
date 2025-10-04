@@ -148,7 +148,7 @@ class AuthorServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍2"),
                 bookPrice = BookPrice(2000),
-                authors = listOf(AuthorId(UUID.randomUUID())),
+                authorIds = listOf(AuthorId(UUID.randomUUID())),
                 publicationStatus = PublicationStatus.UNPUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -339,7 +339,7 @@ class AuthorServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍1"),
                 bookPrice = BookPrice(1000),
-                authors = listOf(authorId),
+                authorIds = listOf(authorId),
                 publicationStatus = PublicationStatus.PUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -354,7 +354,7 @@ class AuthorServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍1"),
                 bookPrice = BookPrice(1000),
-                authors = listOf(authorId),
+                authorIds = listOf(authorId),
                 publicationStatus = PublicationStatus.PUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -363,7 +363,7 @@ class AuthorServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍2"),
                 bookPrice = BookPrice(2000),
-                authors = listOf(authorId),
+                authorIds = listOf(authorId),
                 publicationStatus = PublicationStatus.UNPUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -372,7 +372,7 @@ class AuthorServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍3"),
                 bookPrice = BookPrice(3000),
-                authors = listOf(authorId),
+                authorIds = listOf(authorId),
                 publicationStatus = PublicationStatus.PUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)

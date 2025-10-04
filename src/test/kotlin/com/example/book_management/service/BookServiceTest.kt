@@ -46,7 +46,7 @@ class BookServiceTest {
 
             every { bookDomainService.isDuplicateBook(book) } returns false
             every { bookRepo.insert(book) } just Runs
-            every { bookAuthorsRepo.insertBookAuthors(book.id, book.authors) } just Runs
+            every { bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds) } just Runs
 
             // When
             bookService.insert(book)
@@ -54,7 +54,7 @@ class BookServiceTest {
             // Then
             verify { bookDomainService.isDuplicateBook(book) }
             verify { bookRepo.insert(book) }
-            verify { bookAuthorsRepo.insertBookAuthors(book.id, book.authors) }
+            verify { bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds) }
         }
 
         @Test
@@ -100,7 +100,7 @@ class BookServiceTest {
                     existingBook.updatedAt
                 )
             } returns 1
-            every { bookAuthorsRepo.updateBookAuthors(book.id, book.authors) } just Runs
+            every { bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds) } just Runs
 
             // When
             bookService.update(book)
@@ -117,7 +117,7 @@ class BookServiceTest {
                     existingBook.updatedAt
                 )
             }
-            verify { bookAuthorsRepo.updateBookAuthors(book.id, book.authors) }
+            verify { bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds) }
         }
 
         @Test
@@ -293,7 +293,7 @@ class BookServiceTest {
 
             every { bookDomainService.isDuplicateBook(book) } returns false
             every { bookRepo.insert(book) } throws RuntimeException("データベースエラー")
-            every { bookAuthorsRepo.insertBookAuthors(book.id, book.authors) } just Runs
+            every { bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds) } just Runs
 
             // When & Then
             assertThatThrownBy { bookService.insert(book) }
@@ -326,7 +326,7 @@ class BookServiceTest {
                     existingBook.updatedAt
                 )
             } throws RuntimeException("データベースエラー")
-            every { bookAuthorsRepo.updateBookAuthors(book.id, book.authors) } just Runs
+            every { bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds) } just Runs
 
             // When & Then
             assertThatThrownBy { bookService.update(book) }
@@ -355,7 +355,7 @@ class BookServiceTest {
             id = BookId(UUID.randomUUID()),
             title = BookTitle("テスト書籍"),
             bookPrice = BookPrice(1000),
-            authors = listOf(AuthorId(UUID.randomUUID())),
+            authorIds = listOf(AuthorId(UUID.randomUUID())),
             publicationStatus = PublicationStatus.PUBLISHED,
             createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
             updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -367,7 +367,7 @@ class BookServiceTest {
             id = BookId(UUID.randomUUID()),
             title = BookTitle("テスト書籍"),
             bookPrice = BookPrice(1000),
-            authors = listOf(AuthorId(UUID.randomUUID())),
+            authorIds = listOf(AuthorId(UUID.randomUUID())),
             publicationStatus = status,
             createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
             updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -381,7 +381,7 @@ class BookServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍1"),
                 bookPrice = BookPrice(1000),
-                authors = listOf(authorId),
+                authorIds = listOf(authorId),
                 publicationStatus = PublicationStatus.PUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)
@@ -390,7 +390,7 @@ class BookServiceTest {
                 id = BookId(UUID.randomUUID()),
                 title = BookTitle("テスト書籍2"),
                 bookPrice = BookPrice(2000),
-                authors = listOf(authorId),
+                authorIds = listOf(authorId),
                 publicationStatus = PublicationStatus.UNPUBLISHED,
                 createdAt = LocalDateTime.of(2024, 1, 1, 0, 0),
                 updatedAt = LocalDateTime.of(2024, 1, 1, 0, 0)

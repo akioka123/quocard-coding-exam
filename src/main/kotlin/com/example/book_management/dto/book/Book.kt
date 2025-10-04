@@ -11,13 +11,13 @@ data class Book(
     val id: BookId,
     val title: BookTitle,
     val bookPrice: BookPrice,
-    val authors: List<AuthorId>,
+    val authorIds: List<AuthorId>,
     val publicationStatus: PublicationStatus,
     val createdAt: LocalDateTime,
     val updatedAt: LocalDateTime
 ) {
     init {
-        require(authors.isNotEmpty()) { "書籍には最低1人の著者が必要です。" }
+        require(authorIds.isNotEmpty()) { "書籍には最低1人の著者が必要です。" }
     }
 
     companion object {
@@ -25,12 +25,12 @@ data class Book(
          * データベースレコードからドメインオブジェクトを構築するファクトリーメソッド
          * ドメインロジックとしてデータ整合性を保証する
          */
-        fun fromRecord(record: BooksRecord, authors: List<AuthorId> = emptyList()): Book {
+        fun fromRecord(record: BooksRecord, authorIds: List<AuthorId> = emptyList()): Book {
             return Book(
                 id = BookId(record.id ?: throw IllegalStateException("書籍IDがnullです")),
                 title = BookTitle(record.title ?: throw IllegalStateException("書籍タイトルがnullです")),
                 bookPrice = BookPrice(record.price ?: throw IllegalStateException("価格がnullです")),
-                authors = authors,
+                authorIds = authorIds,
                 publicationStatus = PublicationStatus.fromValue(
                     record.publicationStatus ?: throw IllegalStateException(
                         "出版状況がnullです"

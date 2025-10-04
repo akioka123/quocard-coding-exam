@@ -7,7 +7,5 @@ import com.fasterxml.jackson.annotation.JsonProperty
  */
 data class AuthorCreateResponse(
     @param:JsonProperty("AuthorId")
-    val authorId: String,
-    @param:JsonProperty("BookIds")
-    val bookIds: List<String>
+    val authorId: String
 )

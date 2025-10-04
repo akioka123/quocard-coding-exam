@@ -4,22 +4,15 @@ import com.example.book_management.dto.author.Author
 import com.example.book_management.dto.author.AuthorId
 import com.example.book_management.dto.author.CreateAuthorRequest
 import com.example.book_management.dto.author.UpdateAuthorRequest
-import com.example.book_management.dto.book.Book
-import com.example.book_management.dto.book.BookId
 import com.example.book_management.dto.response.AuthorCreateResponse
 import com.example.book_management.dto.response.AuthorUpdateResponse
 import com.example.book_management.dto.response.SuccessResponse
 import com.example.book_management.service.AuthorService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import java.time.LocalDateTime
-import java.util.UUID
+import java.util.*
 
 /**
  * 著者コントローラー
@@ -49,25 +42,13 @@ class AuthorController(
             LocalDateTime.now()
         )
 
-        val books: List<Book> = request.books.map {
-            Book(
-                BookId(UUID.randomUUID()),
-                it.title,
-                it.bookPrice,
-                listOf(authorId),
-                it.publicationStatus,
-                LocalDateTime.now(),
-                LocalDateTime.now()
-            )
-        }
-
-        authorService.insert(createdAuthor, books)
+        authorService.insert(createdAuthor, request.bookIds)
 
         val response = SuccessResponse(
             statusCode = HttpStatus.OK,
             data = AuthorCreateResponse(
-                authorId = authorId.value.toString(),
-                bookIds = books.map { it.id.value.toString() })
+                authorId = authorId.value.toString()
+            )
         )
 
         return ResponseEntity.ok(response)

@@ -17,14 +17,12 @@ class AuthorCreateResponseTest {
         fun constructor_validAuthorIdAndBookIds() {
             // Given
             val authorId = "12345678-1234-1234-1234-123456789abc"
-            val bookIds = listOf("book1-uuid", "book2-uuid", "book3-uuid")
 
             // When
-            val response = AuthorCreateResponse(authorId = authorId, bookIds = bookIds)
+            val response = AuthorCreateResponse(authorId = authorId)
 
             // Then
             assertThat(response.authorId).isEqualTo(authorId)
-            assertThat(response.bookIds).isEqualTo(bookIds)
         }
 
         @Test
@@ -32,14 +30,12 @@ class AuthorCreateResponseTest {
         fun constructor_emptyBookIds() {
             // Given
             val authorId = "12345678-1234-1234-1234-123456789abc"
-            val bookIds = emptyList<String>()
 
             // When
-            val response = AuthorCreateResponse(authorId = authorId, bookIds = bookIds)
+            val response = AuthorCreateResponse(authorId = authorId)
 
             // Then
             assertThat(response.authorId).isEqualTo(authorId)
-            assertThat(response.bookIds).isEmpty()
         }
     }
 
@@ -52,9 +48,8 @@ class AuthorCreateResponseTest {
         fun equals_sameValues() {
             // Given
             val authorId = "12345678-1234-1234-1234-123456789abc"
-            val bookIds = listOf("book1-uuid", "book2-uuid")
-            val response1 = AuthorCreateResponse(authorId = authorId, bookIds = bookIds)
-            val response2 = AuthorCreateResponse(authorId = authorId, bookIds = bookIds)
+            val response1 = AuthorCreateResponse(authorId = authorId)
+            val response2 = AuthorCreateResponse(authorId = authorId)
 
             // Then
             assertThat(response1).isEqualTo(response2)
@@ -65,12 +60,10 @@ class AuthorCreateResponseTest {
         fun equals_differentValues() {
             // Given
             val response1 = AuthorCreateResponse(
-                authorId = "12345678-1234-1234-1234-123456789abc",
-                bookIds = listOf("book1-uuid")
+                authorId = "12345678-1234-1234-1234-123456789abc"
             )
             val response2 = AuthorCreateResponse(
-                authorId = "87654321-4321-4321-4321-cba987654321",
-                bookIds = listOf("book2-uuid")
+                authorId = "87654321-4321-4321-4321-cba987654321"
             )
 
             // Then
@@ -82,9 +75,8 @@ class AuthorCreateResponseTest {
         fun hashCode_sameValues() {
             // Given
             val authorId = "12345678-1234-1234-1234-123456789abc"
-            val bookIds = listOf("book1-uuid", "book2-uuid")
-            val response1 = AuthorCreateResponse(authorId = authorId, bookIds = bookIds)
-            val response2 = AuthorCreateResponse(authorId = authorId, bookIds = bookIds)
+            val response1 = AuthorCreateResponse(authorId = authorId)
+            val response2 = AuthorCreateResponse(authorId = authorId)
 
             // Then
             assertThat(response1.hashCode()).isEqualTo(response2.hashCode())
@@ -95,19 +87,16 @@ class AuthorCreateResponseTest {
         fun copy_differentValues() {
             // Given
             val originalResponse = AuthorCreateResponse(
-                authorId = "12345678-1234-1234-1234-123456789abc",
-                bookIds = listOf("book1-uuid")
+                authorId = "12345678-1234-1234-1234-123456789abc"
             )
 
             // When
             val copiedResponse = originalResponse.copy(
-                authorId = "87654321-4321-4321-4321-cba987654321",
-                bookIds = listOf("book2-uuid", "book3-uuid")
+                authorId = "87654321-4321-4321-4321-cba987654321"
             )
 
             // Then
             assertThat(copiedResponse.authorId).isEqualTo("87654321-4321-4321-4321-cba987654321")
-            assertThat(copiedResponse.bookIds).isEqualTo(listOf("book2-uuid", "book3-uuid"))
         }
     }
 }

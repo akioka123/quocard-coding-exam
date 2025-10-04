@@ -6,15 +6,12 @@ import com.example.book_management.dto.author.AuthorName
 import com.example.book_management.dto.author.BirthDate
 import com.example.book_management.dto.book.*
 import com.example.book_management.repository.AuthorRepository
-import com.example.book_management.repository.BookAuthorsRepository
-import com.example.book_management.repository.BookRepository
 import io.mockk.*
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.dao.OptimisticLockingFailureException
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -24,17 +21,11 @@ import java.util.*
 class AuthorServiceTest {
 
     private val authorRepo: AuthorRepository = mockk()
-    private val bookRepo: BookRepository = mockk()
-    private val bookAuthorsRepo: BookAuthorsRepository = mockk()
     private val authorDomainService: AuthorDomainService = mockk()
-    private val bookDomainService: BookDomainService = mockk()
 
     private val authorService = AuthorService(
         authorRepo = authorRepo,
-        bookRepo = bookRepo,
-        bookAuthorsRepo = bookAuthorsRepo,
-        authorDomainService = authorDomainService,
-        bookDomainService = bookDomainService
+        authorDomainService = authorDomainService
     )
 
     @BeforeEach
@@ -47,47 +38,19 @@ class AuthorServiceTest {
     inner class InsertTest {
 
         @Test
-        @DisplayName("正常系：著者と書籍の登録が成功する場合")
+        @DisplayName("正常系：著者の登録が成功する場合")
         fun insert_success() {
             // Given
             val author = createTestAuthor()
             val books = createTestBooks()
 
-            every { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) } returns false
-            every { bookDomainService.isDuplicateBook(any()) } returns false
-            every { authorRepo.insert(author.id, author.name, author.birthDate) } just Runs
-            every { bookRepo.insertMany(books) } just Runs
-            every { bookAuthorsRepo.insertAuthorBooks(author.id, books.map { it.id }) } just Runs
+            every { authorRepo.insert(author, books.map { it.id }) } just Runs
 
             // When
-            authorService.insert(author, books)
+            authorService.insert(author, books.map { it.id })
 
             // Then
-            verify { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) }
-            verify { bookDomainService.isDuplicateBook(any()) }
-            verify { authorRepo.insert(author.id, author.name, author.birthDate) }
-            verify { bookRepo.insertMany(books) }
-            verify { bookAuthorsRepo.insertAuthorBooks(author.id, books.map { it.id }) }
-        }
-
-        @Test
-        @DisplayName("異常系：重複著者が存在する場合")
-        fun insert_duplicateAuthor() {
-            // Given
-            val author = createTestAuthor()
-            val books = createTestBooks()
-
-            every { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) } returns true
-
-            // When & Then
-            assertThatThrownBy { authorService.insert(author, books) }
-                .isInstanceOf(DuplicateKeyException::class.java)
-                .hasMessage("同名で生年月日が同じ著者が存在します。")
-
-            verify { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) }
-            verify(exactly = 0) { authorRepo.insert(any(), any(), any()) }
-            verify(exactly = 0) { bookRepo.insertMany(any()) }
-            verify(exactly = 0) { bookAuthorsRepo.insertAuthorBooks(any(), any()) }
+            verify { authorRepo.insert(author, books.map { it.id }) }
         }
 
         @Test
@@ -97,21 +60,13 @@ class AuthorServiceTest {
             val author = createTestAuthor()
             val emptyBooks = emptyList<Book>()
 
-            every { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) } returns false
-            every { bookDomainService.isDuplicateBook(any()) } returns false
-            every { authorRepo.insert(author.id, author.name, author.birthDate) } just Runs
-            every { bookRepo.insertMany(emptyBooks) } just Runs
-            every { bookAuthorsRepo.insertAuthorBooks(author.id, emptyBooks.map { it.id }) } just Runs
+            every { authorRepo.insert(author, emptyBooks.map { it.id }) } just Runs
 
             // When
-            authorService.insert(author, emptyBooks)
+            authorService.insert(author, emptyBooks.map { it.id })
 
             // Then
-            verify { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) }
-            verify(exactly = 0) { bookDomainService.isDuplicateBook(any()) }
-            verify { authorRepo.insert(author.id, author.name, author.birthDate) }
-            verify { bookRepo.insertMany(emptyBooks) }
-            verify { bookAuthorsRepo.insertAuthorBooks(author.id, emptyBooks.map { it.id }) }
+            verify { authorRepo.insert(author, emptyBooks.map { it.id }) }
         }
 
         @Test
@@ -121,21 +76,13 @@ class AuthorServiceTest {
             val author = createTestAuthor()
             val multipleBooks = createMultipleTestBooks()
 
-            every { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) } returns false
-            every { bookDomainService.isDuplicateBook(any()) } returns false
-            every { authorRepo.insert(author.id, author.name, author.birthDate) } just Runs
-            every { bookRepo.insertMany(multipleBooks) } just Runs
-            every { bookAuthorsRepo.insertAuthorBooks(author.id, multipleBooks.map { it.id }) } just Runs
+            every { authorRepo.insert(author, multipleBooks.map { it.id }) } just Runs
 
             // When
-            authorService.insert(author, multipleBooks)
+            authorService.insert(author, multipleBooks.map { it.id })
 
             // Then
-            verify { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) }
-            verify { bookDomainService.isDuplicateBook(any()) }
-            verify { authorRepo.insert(author.id, author.name, author.birthDate) }
-            verify { bookRepo.insertMany(multipleBooks) }
-            verify { bookAuthorsRepo.insertAuthorBooks(author.id, multipleBooks.map { it.id }) }
+            verify { authorRepo.insert(author, multipleBooks.map { it.id }) }
         }
 
         @Test
@@ -155,23 +102,13 @@ class AuthorServiceTest {
             )
             val allBooks = listOf(duplicateBook, notDuplicateBook)
 
-            every { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) } returns false
-            every { bookDomainService.isDuplicateBook(duplicateBook) } returns true
-            every { bookDomainService.isDuplicateBook(notDuplicateBook) } returns false
-            every { authorRepo.insert(author.id, author.name, author.birthDate) } just Runs
-            every { bookRepo.insertMany(listOf(notDuplicateBook)) } just Runs
-            every { bookAuthorsRepo.insertAuthorBooks(author.id, allBooks.map { it.id }) } just Runs
+            every { authorRepo.insert(author, allBooks.map { it.id }) } just Runs
 
             // When
-            authorService.insert(author, allBooks)
+            authorService.insert(author, allBooks.map { it.id })
 
             // Then
-            verify { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) }
-            verify { bookDomainService.isDuplicateBook(duplicateBook) }
-            verify { bookDomainService.isDuplicateBook(notDuplicateBook) }
-            verify { authorRepo.insert(author.id, author.name, author.birthDate) }
-            verify { bookRepo.insertMany(listOf(notDuplicateBook)) } // 重複しない書籍のみ登録
-            verify { bookAuthorsRepo.insertAuthorBooks(author.id, allBooks.map { it.id }) } // 全ての書籍の関連付け
+            verify { authorRepo.insert(author, allBooks.map { it.id }) }
         }
     }
 
@@ -265,23 +202,14 @@ class AuthorServiceTest {
             val author = createTestAuthor()
             val books = createTestBooks()
 
-            every { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) } returns false
-            every { bookDomainService.isDuplicateBook(any()) } returns false
-            every { authorRepo.insert(author.id, author.name, author.birthDate) } just Runs
-            every { bookRepo.insertMany(books) } throws RuntimeException("データベースエラー")
-            every { bookAuthorsRepo.insertAuthorBooks(author.id, books.map { it.id }) } just Runs
+            every { authorRepo.insert(author, books.map { it.id }) } throws RuntimeException("データベースエラー")
 
             // When & Then
-            assertThatThrownBy { authorService.insert(author, books) }
+            assertThatThrownBy { authorService.insert(author, books.map { it.id }) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("データベースエラー")
 
-            verify { authorDomainService.isDuplicateAuthor(author.name, author.birthDate) }
-            verify { bookDomainService.isDuplicateBook(any()) }
-            verify { authorRepo.insert(author.id, author.name, author.birthDate) }
-            verify { bookRepo.insertMany(books) }
-            // bookAuthorsRepo.insertAuthorBooksは呼ばれない（トランザクションロールバック）
-            verify(exactly = 0) { bookAuthorsRepo.insertAuthorBooks(any(), any()) }
+            verify { authorRepo.insert(author, books.map { it.id }) }
         }
 
         @Test

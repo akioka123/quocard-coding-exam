@@ -2,7 +2,6 @@ package com.example.book_management.service
 
 import com.example.book_management.dto.author.AuthorId
 import com.example.book_management.dto.book.*
-import com.example.book_management.repository.BookAuthorsRepository
 import com.example.book_management.repository.BookRepository
 import io.mockk.*
 import org.assertj.core.api.Assertions.assertThat
@@ -11,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.dao.OptimisticLockingFailureException
 import java.time.LocalDateTime
 import java.util.*
@@ -20,12 +18,10 @@ import java.util.*
 class BookServiceTest {
 
     private val bookRepo: BookRepository = mockk()
-    private val bookAuthorsRepo: BookAuthorsRepository = mockk()
     private val bookDomainService: BookDomainService = mockk()
 
     private val bookService = BookService(
         bookRepo = bookRepo,
-        bookAuthorsRepo = bookAuthorsRepo,
         bookDomainService = bookDomainService
     )
 
@@ -44,35 +40,13 @@ class BookServiceTest {
             // Given
             val book = createTestBook()
 
-            every { bookDomainService.isDuplicateBook(book) } returns false
             every { bookRepo.insert(book) } just Runs
-            every { bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds) } just Runs
 
             // When
             bookService.insert(book)
 
             // Then
-            verify { bookDomainService.isDuplicateBook(book) }
             verify { bookRepo.insert(book) }
-            verify { bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds) }
-        }
-
-        @Test
-        @DisplayName("異常系：重複書籍が存在する場合")
-        fun insert_duplicateBook() {
-            // Given
-            val book = createTestBook()
-
-            every { bookDomainService.isDuplicateBook(book) } returns true
-
-            // When & Then
-            assertThatThrownBy { bookService.insert(book) }
-                .isInstanceOf(DuplicateKeyException::class.java)
-                .hasMessage("タイトルと値段が同じ書籍が存在します。")
-
-            verify { bookDomainService.isDuplicateBook(book) }
-            verify(exactly = 0) { bookRepo.insert(any()) }
-            verify(exactly = 0) { bookAuthorsRepo.insertBookAuthors(any(), any()) }
         }
     }
 
@@ -93,14 +67,10 @@ class BookServiceTest {
             every { existingBook.updatedAt } returns LocalDateTime.of(2024, 1, 2, 0, 0)
             every {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             } returns 1
-            every { bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds) } just Runs
 
             // When
             bookService.update(book)
@@ -110,14 +80,10 @@ class BookServiceTest {
             verify { existingBook.publicationStatus.transitionTo(book.publicationStatus) }
             verify {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             }
-            verify { bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds) }
         }
 
         @Test
@@ -135,8 +101,7 @@ class BookServiceTest {
                 .hasMessage(errorMessage)
 
             verify { bookDomainService.validateBookExists(book) }
-            verify(exactly = 0) { bookRepo.update(any(), any(), any(), any(), any()) }
-            verify(exactly = 0) { bookAuthorsRepo.updateBookAuthors(any(), any()) }
+            verify(exactly = 0) { bookRepo.update(any(), any()) }
         }
 
         @Test
@@ -157,8 +122,7 @@ class BookServiceTest {
 
             verify { bookDomainService.validateBookExists(book) }
             verify { existingBook.publicationStatus.transitionTo(book.publicationStatus) }
-            verify(exactly = 0) { bookRepo.update(any(), any(), any(), any(), any()) }
-            verify(exactly = 0) { bookAuthorsRepo.updateBookAuthors(any(), any()) }
+            verify(exactly = 0) { bookRepo.update(any(), any()) }
         }
 
         @Test
@@ -174,10 +138,7 @@ class BookServiceTest {
             every { existingBook.updatedAt } returns LocalDateTime.of(2024, 1, 2, 0, 0)
             every {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             } returns 0
@@ -191,14 +152,10 @@ class BookServiceTest {
             verify { existingBook.publicationStatus.transitionTo(book.publicationStatus) }
             verify {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             }
-            verify(exactly = 0) { bookAuthorsRepo.updateBookAuthors(any(), any()) }
         }
 
         @Test
@@ -214,10 +171,7 @@ class BookServiceTest {
             every { existingBook.updatedAt } returns LocalDateTime.of(2024, 1, 2, 0, 0)
             every {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             } returns 0
@@ -231,14 +185,10 @@ class BookServiceTest {
             verify { existingBook.publicationStatus.transitionTo(book.publicationStatus) }
             verify {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             }
-            verify(exactly = 0) { bookAuthorsRepo.updateBookAuthors(any(), any()) }
         }
     }
 
@@ -291,19 +241,14 @@ class BookServiceTest {
             // Given
             val book = createTestBook()
 
-            every { bookDomainService.isDuplicateBook(book) } returns false
             every { bookRepo.insert(book) } throws RuntimeException("データベースエラー")
-            every { bookAuthorsRepo.insertBookAuthors(book.id, book.authorIds) } just Runs
 
             // When & Then
             assertThatThrownBy { bookService.insert(book) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("データベースエラー")
 
-            verify { bookDomainService.isDuplicateBook(book) }
             verify { bookRepo.insert(book) }
-            // bookAuthorsRepo.insertBookAuthorsは呼ばれない（トランザクションロールバック）
-            verify(exactly = 0) { bookAuthorsRepo.insertBookAuthors(any(), any()) }
         }
 
         @Test
@@ -319,14 +264,10 @@ class BookServiceTest {
             every { existingBook.updatedAt } returns LocalDateTime.of(2024, 1, 2, 0, 0)
             every {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             } throws RuntimeException("データベースエラー")
-            every { bookAuthorsRepo.updateBookAuthors(book.id, book.authorIds) } just Runs
 
             // When & Then
             assertThatThrownBy { bookService.update(book) }
@@ -337,15 +278,10 @@ class BookServiceTest {
             verify { existingBook.publicationStatus.transitionTo(book.publicationStatus) }
             verify {
                 bookRepo.update(
-                    book.id,
-                    book.title,
-                    book.bookPrice,
-                    book.publicationStatus,
+                    book,
                     existingBook.updatedAt
                 )
             }
-            // bookAuthorsRepo.updateBookAuthorsは呼ばれない（トランザクションロールバック）
-            verify(exactly = 0) { bookAuthorsRepo.updateBookAuthors(any(), any()) }
         }
     }
 

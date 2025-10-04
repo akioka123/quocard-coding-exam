@@ -106,6 +106,9 @@ class JooqBookRepository(private val dsl: DSLContext) : BookRepository {
             .and(BOOKS.UPDATED_AT.eq(expectedUpdatedAt))
             .execute()
 
+        if (updatedCount <= 0) {
+            return updatedCount
+        }
         // 既存の著者情報を削除
         dsl.deleteFrom(BOOK_AUTHORS)
             .where(BOOK_AUTHORS.BOOK_ID.eq(book.id.value))

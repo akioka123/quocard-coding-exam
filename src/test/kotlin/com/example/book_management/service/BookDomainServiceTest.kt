@@ -26,44 +26,7 @@ class BookDomainServiceTest {
     fun setUp() {
         clearAllMocks()
     }
-
-    @Nested
-    @DisplayName("isDuplicateBook メソッド")
-    inner class IsDuplicateBookTest {
-
-        @Test
-        @DisplayName("正常系：重複書籍が存在しない場合")
-        fun isDuplicateBook_noDuplicate() {
-            // Given
-            val book = createTestBook()
-
-            every { bookRepository.existsByTitleAndPrice(book) } returns false
-
-            // When
-            val result = bookDomainService.isDuplicateBook(book)
-
-            // Then
-            assertThat(result).isFalse()
-            verify { bookRepository.existsByTitleAndPrice(book) }
-        }
-
-        @Test
-        @DisplayName("正常系：重複書籍が存在する場合")
-        fun isDuplicateBook_duplicateExists() {
-            // Given
-            val book = createTestBook()
-
-            every { bookRepository.existsByTitleAndPrice(book) } returns true
-
-            // When
-            val result = bookDomainService.isDuplicateBook(book)
-
-            // Then
-            assertThat(result).isTrue()
-            verify { bookRepository.existsByTitleAndPrice(book) }
-        }
-    }
-
+    
     @Nested
     @DisplayName("validateBookExists メソッド")
     inner class ValidateBookExistsTest {

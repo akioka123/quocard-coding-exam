@@ -29,46 +29,7 @@ class AuthorDomainServiceTest {
     fun setUp() {
         clearAllMocks()
     }
-
-    @Nested
-    @DisplayName("isDuplicateAuthor メソッド")
-    inner class IsDuplicateAuthorTest {
-
-        @Test
-        @DisplayName("正常系：重複著者が存在しない場合")
-        fun isDuplicateAuthor_noDuplicate() {
-            // Given
-            val name = AuthorName("テスト著者")
-            val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
-
-            every { authorRepository.existsByNameAndBirthDate(name, birthDate) } returns false
-
-            // When
-            val result = authorDomainService.isDuplicateAuthor(name, birthDate)
-
-            // Then
-            assertThat(result).isFalse()
-            verify { authorRepository.existsByNameAndBirthDate(name, birthDate) }
-        }
-
-        @Test
-        @DisplayName("正常系：重複著者が存在する場合")
-        fun isDuplicateAuthor_duplicateExists() {
-            // Given
-            val name = AuthorName("テスト著者")
-            val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
-
-            every { authorRepository.existsByNameAndBirthDate(name, birthDate) } returns true
-
-            // When
-            val result = authorDomainService.isDuplicateAuthor(name, birthDate)
-
-            // Then
-            assertThat(result).isTrue()
-            verify { authorRepository.existsByNameAndBirthDate(name, birthDate) }
-        }
-    }
-
+    
     @Nested
     @DisplayName("validateAuthorExists メソッド")
     inner class ValidateAuthorExistsTest {

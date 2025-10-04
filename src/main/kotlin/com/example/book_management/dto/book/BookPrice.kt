@@ -5,7 +5,11 @@ import com.fasterxml.jackson.annotation.JsonValue
 import java.math.BigDecimal
 
 /**
- * 価格を表す値オブジェクト
+ * 書籍価格を表す値オブジェクト
+ * 
+ * BigDecimalをラップした値オブジェクトで、価格の制約（0以上、12桁以内）を
+ * 強制する。JacksonによるJSONシリアライゼーション/デシリアライゼーションを
+ * サポートし、複数の数値型からの変換コンストラクタも提供する。
  */
 @JvmInline
 value class BookPrice @JsonCreator(mode = JsonCreator.Mode.DELEGATING)

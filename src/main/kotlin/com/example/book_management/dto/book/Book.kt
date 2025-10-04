@@ -5,7 +5,12 @@ import com.example.book_management.tables.records.BooksRecord
 import java.time.LocalDateTime
 
 /**
- * 書籍エンティティ
+ * 書籍ドメインエンティティ
+ * 
+ * 書籍の基本情報（ID、タイトル、価格、著者リスト、出版ステータス）と
+ * メタデータ（作成日時、更新日時）を保持するドメインオブジェクト。
+ * データベースレコードからの変換機能も提供し、ドメインロジックとして
+ * データ整合性を保証する。
  */
 data class Book(
     val id: BookId,
@@ -22,8 +27,16 @@ data class Book(
 
     companion object {
         /**
-         * データベースレコードからドメインオブジェクトを構築するファクトリーメソッド
-         * ドメインロジックとしてデータ整合性を保証する
+         * データベースレコードから書籍ドメインオブジェクトを構築するファクトリーメソッド
+         * 
+         * JOOQで生成されたBooksRecordからBookエンティティを作成する。
+         * 必須フィールドがnullの場合はIllegalStateExceptionをスローして
+         * データ整合性を保証する。著者IDリストは別途設定可能。
+         * 
+         * @param record データベースから取得した書籍レコード
+         * @param authorIds 関連付ける著者IDのリスト（デフォルト: 空リスト）
+         * @return 構築された書籍エンティティ
+         * @throws IllegalStateException 必須フィールドがnullの場合
          */
         fun fromRecord(record: BooksRecord, authorIds: List<AuthorId> = emptyList()): Book {
             return Book(

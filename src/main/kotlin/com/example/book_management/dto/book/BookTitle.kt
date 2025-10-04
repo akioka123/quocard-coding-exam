@@ -5,6 +5,10 @@ import com.fasterxml.jackson.annotation.JsonValue
 
 /**
  * 書籍タイトルを表す値オブジェクト
+ * 
+ * 文字列をラップした値オブジェクトで、書籍タイトルの制約（空白不可、100文字以内）を
+ * 強制する。JacksonによるJSONシリアライゼーション/デシリアライゼーションを
+ * サポートし、型安全性を提供する。
  */
 @JvmInline
 value class BookTitle @JsonCreator(mode = JsonCreator.Mode.DELEGATING)

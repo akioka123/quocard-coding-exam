@@ -4,7 +4,11 @@ import com.example.book_management.tables.records.AuthorsRecord
 import java.time.LocalDateTime
 
 /**
- * 著者エンティティ
+ * 著者ドメインエンティティ
+ * 
+ * 著者の基本情報（ID、名前、生年月日）とメタデータ（作成日時、更新日時）を
+ * 保持するドメインオブジェクト。データベースレコードからの変換機能も提供し、
+ * ドメインロジックとしてデータ整合性を保証する。
  */
 data class Author(
     val id: AuthorId,
@@ -15,8 +19,15 @@ data class Author(
 ) {
     companion object {
         /**
-         * データベースレコードからドメインオブジェクトを構築するファクトリーメソッド
-         * ドメインロジックとしてデータ整合性を保証する
+         * データベースレコードから著者ドメインオブジェクトを構築するファクトリーメソッド
+         * 
+         * JOOQで生成されたAuthorsRecordからAuthorエンティティを作成する。
+         * 必須フィールドがnullの場合はIllegalStateExceptionをスローして
+         * データ整合性を保証する。
+         * 
+         * @param record データベースから取得した著者レコード
+         * @return 構築された著者エンティティ
+         * @throws IllegalStateException 必須フィールドがnullの場合
          */
         fun fromRecord(record: AuthorsRecord): Author {
             return Author(

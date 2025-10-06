@@ -19,16 +19,14 @@ class UpdateAuthorRequestTest {
         @DisplayName("正常な値オブジェクトでUpdateAuthorRequestを作成できる")
         fun constructor_validValueObjects() {
             // Given
-            val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中 太郎")
             val birthDate = BirthDate(LocalDate.of(1990, 5, 15))
             val bookIds = listOf(BookId(UUID.randomUUID()), BookId(UUID.randomUUID()))
 
             // When
-            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
+            val request = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = bookIds)
 
             // Then
-            assertThat(request.id).isEqualTo(id)
             assertThat(request.name).isEqualTo(name)
             assertThat(request.birthDate).isEqualTo(birthDate)
             assertThat(request.bookIds).hasSize(2)
@@ -38,12 +36,11 @@ class UpdateAuthorRequestTest {
         @DisplayName("長い著者名でUpdateAuthorRequestを作成できる")
         fun constructor_longAuthorName() {
             // Given
-            val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中太郎佐藤花子田村田中太郎佐藤花子田村") // 20文字境界値
             val birthDate = BirthDate(LocalDate.of(1985, 12, 31))
 
             // When
-            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = emptyList())
+            val request = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = emptyList())
 
             // Then
             assertThat(request.name).isEqualTo(name)
@@ -54,12 +51,11 @@ class UpdateAuthorRequestTest {
         @DisplayName("過去の古い生年月日でUpdateAuthorRequestを作成できる")
         fun constructor_oldBirthDate() {
             // Given
-            val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("山田 花子")
             val birthDate = BirthDate(LocalDate.of(1950, 1, 1))
 
             // When
-            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = emptyList())
+            val request = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = emptyList())
 
             // Then
             assertThat(request.birthDate).isEqualTo(birthDate)
@@ -75,13 +71,12 @@ class UpdateAuthorRequestTest {
         @DisplayName("同じ値オブジェクトを持つUpdateAuthorRequestは等価")
         fun equals_sameValues() {
             // Given
-            val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中 太郎")
             val birthDate = BirthDate(LocalDate.of(1990, 5, 15))
             val bookIds = listOf(BookId(UUID.randomUUID()))
 
-            val request1 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
-            val request2 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
+            val request1 = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = bookIds)
+            val request2 = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = bookIds)
 
             // Then
             assertThat(request1).isEqualTo(request2)
@@ -92,13 +87,11 @@ class UpdateAuthorRequestTest {
         fun equals_differentValues() {
             // Given
             val request1 = UpdateAuthorRequest(
-                id = AuthorId(UUID.randomUUID()),
                 name = AuthorName("田中 太郎"),
                 birthDate = BirthDate(LocalDate.of(1990, 5, 15)),
                 bookIds = emptyList()
             )
             val request2 = UpdateAuthorRequest(
-                id = AuthorId(UUID.randomUUID()),
                 name = AuthorName("佐藤 花子"),
                 birthDate = BirthDate(LocalDate.of(1985, 8, 20)),
                 bookIds = emptyList()
@@ -112,13 +105,12 @@ class UpdateAuthorRequestTest {
         @DisplayName("同じ値オブジェクトを持つUpdateAuthorRequestは同じハッシュコード")
         fun hashCode_sameValues() {
             // Given
-            val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中 太郎")
             val birthDate = BirthDate(LocalDate.of(1990, 5, 15))
             val bookIds = listOf(BookId(UUID.randomUUID()))
 
-            val request1 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
-            val request2 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
+            val request1 = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = bookIds)
+            val request2 = UpdateAuthorRequest(name = name, birthDate = birthDate, bookIds = bookIds)
 
             // Then
             assertThat(request1.hashCode()).isEqualTo(request2.hashCode())
@@ -129,7 +121,6 @@ class UpdateAuthorRequestTest {
         fun copy_differentValues() {
             // Given
             val originalRequest = UpdateAuthorRequest(
-                id = AuthorId(UUID.randomUUID()),
                 name = AuthorName("元の名前"),
                 birthDate = BirthDate(LocalDate.of(1990, 5, 15)),
                 bookIds = listOf(BookId(UUID.randomUUID()))
@@ -142,7 +133,6 @@ class UpdateAuthorRequestTest {
             )
 
             // Then
-            assertThat(copiedRequest.id).isEqualTo(originalRequest.id)
             assertThat(copiedRequest.name.value).isEqualTo("新しい名前")
             assertThat(copiedRequest.birthDate.value).isEqualTo(LocalDate.of(1988, 10, 25))
         }

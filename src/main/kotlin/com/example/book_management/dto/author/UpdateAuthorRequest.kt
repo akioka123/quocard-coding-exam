@@ -10,7 +10,6 @@ import com.example.book_management.dto.book.BookId
  * バリデーションは値オブジェクトのinitブロックで実行される。
  */
 data class UpdateAuthorRequest(
-    val id: AuthorId,
     val name: AuthorName,
     val birthDate: BirthDate,
     val bookIds: List<BookId>

@@ -44,7 +44,7 @@ class AuthorController(
      * @throws IllegalArgumentException リクエストパラメータが不正な場合
      * @throws DataAccessException データベースアクセスでエラーが発生した場合
      */
-    @PostMapping("/create")
+    @PostMapping("/")
     fun createAuthor(
         @RequestBody request: CreateAuthorRequest
     ): ResponseEntity<SuccessResponse<AuthorCreateResponse>> {
@@ -86,7 +86,7 @@ class AuthorController(
      * @throws IllegalArgumentException 指定されたIDの著者が存在しない場合
      * @throws DataAccessException データベースアクセスでエラーが発生した場合
      */
-    @PutMapping("/update/{id}")
+    @PutMapping("/{id}")
     fun updateAuthor(
         @RequestBody request: UpdateAuthorRequest,
         @PathVariable id: UUID

@@ -1,5 +1,6 @@
 package com.example.book_management.dto.author
 
+import com.example.book_management.dto.book.BookId
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -21,14 +22,16 @@ class UpdateAuthorRequestTest {
             val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中 太郎")
             val birthDate = BirthDate(LocalDate.of(1990, 5, 15))
+            val bookIds = listOf(BookId(UUID.randomUUID()), BookId(UUID.randomUUID()))
 
             // When
-            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
+            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
 
             // Then
             assertThat(request.id).isEqualTo(id)
             assertThat(request.name).isEqualTo(name)
             assertThat(request.birthDate).isEqualTo(birthDate)
+            assertThat(request.bookIds).hasSize(2)
         }
 
         @Test
@@ -40,7 +43,7 @@ class UpdateAuthorRequestTest {
             val birthDate = BirthDate(LocalDate.of(1985, 12, 31))
 
             // When
-            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
+            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = emptyList())
 
             // Then
             assertThat(request.name).isEqualTo(name)
@@ -56,7 +59,7 @@ class UpdateAuthorRequestTest {
             val birthDate = BirthDate(LocalDate.of(1950, 1, 1))
 
             // When
-            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
+            val request = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = emptyList())
 
             // Then
             assertThat(request.birthDate).isEqualTo(birthDate)
@@ -75,9 +78,10 @@ class UpdateAuthorRequestTest {
             val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中 太郎")
             val birthDate = BirthDate(LocalDate.of(1990, 5, 15))
+            val bookIds = listOf(BookId(UUID.randomUUID()))
 
-            val request1 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
-            val request2 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
+            val request1 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
+            val request2 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
 
             // Then
             assertThat(request1).isEqualTo(request2)
@@ -90,12 +94,14 @@ class UpdateAuthorRequestTest {
             val request1 = UpdateAuthorRequest(
                 id = AuthorId(UUID.randomUUID()),
                 name = AuthorName("田中 太郎"),
-                birthDate = BirthDate(LocalDate.of(1990, 5, 15))
+                birthDate = BirthDate(LocalDate.of(1990, 5, 15)),
+                bookIds = emptyList()
             )
             val request2 = UpdateAuthorRequest(
                 id = AuthorId(UUID.randomUUID()),
                 name = AuthorName("佐藤 花子"),
-                birthDate = BirthDate(LocalDate.of(1985, 8, 20))
+                birthDate = BirthDate(LocalDate.of(1985, 8, 20)),
+                bookIds = emptyList()
             )
 
             // Then
@@ -109,9 +115,10 @@ class UpdateAuthorRequestTest {
             val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("田中 太郎")
             val birthDate = BirthDate(LocalDate.of(1990, 5, 15))
+            val bookIds = listOf(BookId(UUID.randomUUID()))
 
-            val request1 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
-            val request2 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate)
+            val request1 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
+            val request2 = UpdateAuthorRequest(id = id, name = name, birthDate = birthDate, bookIds = bookIds)
 
             // Then
             assertThat(request1.hashCode()).isEqualTo(request2.hashCode())
@@ -124,7 +131,8 @@ class UpdateAuthorRequestTest {
             val originalRequest = UpdateAuthorRequest(
                 id = AuthorId(UUID.randomUUID()),
                 name = AuthorName("元の名前"),
-                birthDate = BirthDate(LocalDate.of(1990, 5, 15))
+                birthDate = BirthDate(LocalDate.of(1990, 5, 15)),
+                bookIds = listOf(BookId(UUID.randomUUID()))
             )
 
             // When

@@ -4,7 +4,9 @@ import com.example.book_management.dto.author.Author
 import com.example.book_management.dto.author.AuthorId
 import com.example.book_management.dto.author.AuthorName
 import com.example.book_management.dto.author.BirthDate
+import com.example.book_management.dto.book.BookId
 import com.example.book_management.tables.references.AUTHORS
+import com.example.book_management.tables.references.BOOK_AUTHORS
 import example.testconfig.JooqTestSchemaConfig
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
@@ -15,12 +17,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.jdbc.Sql
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
 @ActiveProfiles("test")
 @Import(JooqTestSchemaConfig::class)
+@Sql(scripts = ["/sql/JooqAuthorRepository.sql"])
 @DisplayName("JooqAuthorRepository 統合テスト")
 class JooqAuthorRepositoryTest : BaseRepositoryTest() {
 
@@ -120,6 +124,7 @@ class JooqAuthorRepositoryTest : BaseRepositoryTest() {
             val originalName = AuthorName("元の名前")
             val newName = AuthorName("新しい名前")
             val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
+            val bookIds = emptyList<BookId>() // 書籍IDは空でテスト
 
             val author = createTestAuthor(id, originalName, birthDate)
             authorRepository.insert(author, emptyList())
@@ -132,7 +137,7 @@ class JooqAuthorRepositoryTest : BaseRepositoryTest() {
             Thread.sleep(100) // updated_atの差分を作る
 
             // When
-            val updatedRows = authorRepository.update(id, newName, birthDate, expectedUpdatedAt)
+            val updatedRows = authorRepository.update(id, newName, birthDate, bookIds, expectedUpdatedAt)
 
             // Then
             assertThat(updatedRows).isEqualTo(1)
@@ -148,10 +153,11 @@ class JooqAuthorRepositoryTest : BaseRepositoryTest() {
             val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("テスト著者")
             val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
+            val bookIds = emptyList<BookId>()
             val updatedAt = LocalDateTime.now()
 
             // When
-            val updatedRows = authorRepository.update(id, name, birthDate, updatedAt)
+            val updatedRows = authorRepository.update(id, name, birthDate, bookIds, updatedAt)
 
             // Then
             assertThat(updatedRows).isEqualTo(0)
@@ -164,72 +170,81 @@ class JooqAuthorRepositoryTest : BaseRepositoryTest() {
             val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("テスト著者")
             val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
+            val bookIds = emptyList<BookId>()
             val wrongUpdatedAt = LocalDateTime.of(2020, 1, 1, 0, 0)
 
             val author = createTestAuthor(id, name, birthDate)
             authorRepository.insert(author, emptyList())
 
             // When
-            val updatedRows = authorRepository.update(id, name, birthDate, wrongUpdatedAt)
+            val updatedRows = authorRepository.update(id, name, birthDate, bookIds, wrongUpdatedAt)
 
             // Then
             assertThat(updatedRows).isEqualTo(0)
         }
-    }
-
-    @Nested
-    @DisplayName("existsByNameAndBirthDate メソッド")
-    inner class ExistsByNameAndBirthDateTest {
 
         @Test
-        @DisplayName("正常系：存在する著者名・生年月日でtrueが返される")
-        fun existsByNameAndBirthDate_exists() {
+        @DisplayName("正常系：書籍IDが指定された場合の更新")
+        fun update_withBookIds() {
+            // Given
+            val authorId = AuthorId(UUID.fromString("11111111-1111-1111-1111-111111111111"))
+            val bookId1 = BookId(UUID.fromString("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"))
+            val bookId2 = BookId(UUID.fromString("cccccccc-cccc-cccc-cccc-cccccccccccc"))
+            val name = AuthorName("テスト著者")
+            val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
+            val bookIds = listOf(bookId1, bookId2)
+
+            // 挿入された著者のupdatedAtを取得
+            val insertedAuthor = authorRepository.findById(authorId)
+            val expectedUpdatedAt = insertedAuthor!!.updatedAt
+
+            Thread.sleep(100) // updated_atの差分を作る
+
+            // When
+            val updatedRows = authorRepository.update(authorId, name, birthDate, bookIds, expectedUpdatedAt)
+
+            // Then
+            assertThat(updatedRows).isEqualTo(1)
+            val updatedAuthor = authorRepository.findById(authorId)
+            assertThat(updatedAuthor).isNotNull()
+            assertThat(updatedAuthor!!.name).isEqualTo(name)
+
+            // 書籍IDの関連付けも確認（BOOK_AUTHORSテーブルの確認）
+            val bookAuthorsCount = dslContext.selectCount()
+                .from(BOOK_AUTHORS)
+                .where(BOOK_AUTHORS.AUTHOR_ID.eq(authorId.value))
+                .fetchOne(0, Int::class.java)
+
+            assertThat(bookAuthorsCount).isEqualTo(2)
+        }
+
+        @Test
+        @DisplayName("境界値：空の書籍IDリストで更新")
+        fun update_emptyBookIds() {
             // Given
             val id = AuthorId(UUID.randomUUID())
             val name = AuthorName("テスト著者")
             val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
+            val emptyBookIds = emptyList<BookId>()
 
             val author = createTestAuthor(id, name, birthDate)
             authorRepository.insert(author, emptyList())
 
-            // When
-            val exists = authorRepository.existsByNameAndBirthDate(name, birthDate)
+            // 挿入された著者のupdatedAtを取得
+            val insertedAuthor = authorRepository.findById(id)
+            assertThat(insertedAuthor).isNotNull()
+            val expectedUpdatedAt = insertedAuthor!!.updatedAt
 
-            // Then
-            assertThat(exists).isTrue()
-        }
-
-        @Test
-        @DisplayName("正常系：存在しない著者名・生年月日でfalseが返される")
-        fun existsByNameAndBirthDate_notExists() {
-            // Given
-            val name = AuthorName("存在しない著者")
-            val birthDate = BirthDate(LocalDate.of(1990, 1, 1))
+            Thread.sleep(100) // updated_atの差分を作る
 
             // When
-            val exists = authorRepository.existsByNameAndBirthDate(name, birthDate)
+            val updatedRows = authorRepository.update(id, name, birthDate, emptyBookIds, expectedUpdatedAt)
 
             // Then
-            assertThat(exists).isFalse()
-        }
-
-        @Test
-        @DisplayName("境界値：同じ名前で異なる生年月日でfalseが返される")
-        fun existsByNameAndBirthDate_differentBirthDate() {
-            // Given
-            val id = AuthorId(UUID.randomUUID())
-            val name = AuthorName("テスト著者")
-            val originalBirthDate = BirthDate(LocalDate.of(1990, 1, 1))
-            val differentBirthDate = BirthDate(LocalDate.of(1991, 1, 1))
-
-            val author = createTestAuthor(id, name, originalBirthDate)
-            authorRepository.insert(author, emptyList())
-
-            // When
-            val exists = authorRepository.existsByNameAndBirthDate(name, differentBirthDate)
-
-            // Then
-            assertThat(exists).isFalse()
+            assertThat(updatedRows).isEqualTo(1)
+            val updatedAuthor = authorRepository.findById(id)
+            assertThat(updatedAuthor).isNotNull()
+            assertThat(updatedAuthor!!.name).isEqualTo(name)
         }
     }
 

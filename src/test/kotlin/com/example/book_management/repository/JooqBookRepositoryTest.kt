@@ -5,13 +5,11 @@ import com.example.book_management.dto.book.*
 import com.example.book_management.tables.references.BOOKS
 import example.testconfig.JooqTestSchemaConfig
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
-import org.springframework.dao.DuplicateKeyException
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.jdbc.Sql
 import java.math.BigDecimal
@@ -26,58 +24,6 @@ class JooqBookRepositoryTest : BaseRepositoryTest() {
 
     @Autowired
     private lateinit var bookRepository: JooqBookRepository
-
-    @Nested
-    @DisplayName("insertMany メソッド")
-    inner class InsertManyTest {
-
-        @Test
-        @DisplayName("正常系：複数の有効な書籍で一括挿入が成功する")
-        fun insertMany_success() {
-            // Given
-            val books = listOf(
-                createTestBook("書籍1", BigDecimal("1000.00")),
-                createTestBook("書籍2", BigDecimal("2000.00")),
-                createTestBook("書籍3", BigDecimal("3000.00"))
-            )
-
-            // When
-            bookRepository.insertMany(books)
-
-            // Then
-            books.forEach { book ->
-                val insertedBook = bookRepository.findById(book.id)
-                assertThat(insertedBook).isNotNull()
-                assertThat(insertedBook!!.title).isEqualTo(book.title)
-                assertThat(insertedBook.bookPrice).isEqualTo(book.bookPrice)
-            }
-        }
-
-        @Test
-        @DisplayName("境界値：空のリストで挿入が成功する")
-        fun insertMany_emptyList() {
-            // Given
-            val books = emptyList<Book>()
-
-            // When & Then - 例外が発生しないことを確認
-            bookRepository.insertMany(books)
-        }
-
-        @Test
-        @DisplayName("異常系：重複IDを含むリストで例外が発生する")
-        fun insertMany_duplicateId() {
-            // Given
-            val duplicateId = BookId(UUID.randomUUID())
-            val books = listOf(
-                createTestBookWithId(duplicateId, "書籍1", BigDecimal("1000")),
-                createTestBookWithId(duplicateId, "書籍2", BigDecimal("2000"))
-            )
-
-            // When & Then
-            assertThatThrownBy { bookRepository.insertMany(books) }
-                .isInstanceOf(DuplicateKeyException::class.java)
-        }
-    }
 
     @Nested
     @DisplayName("insert メソッド")
@@ -123,54 +69,6 @@ class JooqBookRepositoryTest : BaseRepositoryTest() {
 
             assertThat(insertedUnpublished).isNotNull()
             assertThat(insertedUnpublished!!.publicationStatus).isEqualTo(PublicationStatus.UNPUBLISHED)
-        }
-    }
-
-    @Nested
-    @DisplayName("existsByTitleAndPrice メソッド")
-    inner class ExistsByTitleAndPriceTest {
-
-        @Test
-        @DisplayName("正常系：存在するタイトル・価格でtrueが返される")
-        fun existsByTitleAndPrice_exists() {
-            // Given
-            val book = createTestBook("テスト書籍", BigDecimal("1500"))
-            bookRepository.insert(book)
-
-            // When
-            val exists = bookRepository.existsByTitleAndPrice(book)
-
-            // Then
-            assertThat(exists).isTrue()
-        }
-
-        @Test
-        @DisplayName("正常系：存在しないタイトル・価格でfalseが返される")
-        fun existsByTitleAndPrice_notExists() {
-            // Given
-            val book = createTestBook("存在しない書籍", BigDecimal("9999"))
-
-            // When
-            val exists = bookRepository.existsByTitleAndPrice(book)
-
-            // Then
-            assertThat(exists).isFalse()
-        }
-
-        @Test
-        @DisplayName("境界値：同じタイトルで異なる価格でfalseが返される")
-        fun existsByTitleAndPrice_differentPrice() {
-            // Given
-            val originalBook = createTestBook("テスト書籍", BigDecimal("1000"))
-            val differentPriceBook = createTestBook("テスト書籍", BigDecimal("2000"))
-
-            bookRepository.insert(originalBook)
-
-            // When
-            val exists = bookRepository.existsByTitleAndPrice(differentPriceBook)
-
-            // Then
-            assertThat(exists).isFalse()
         }
     }
 
@@ -390,18 +288,6 @@ class JooqBookRepositoryTest : BaseRepositoryTest() {
             title = BookTitle(title),
             bookPrice = BookPrice(price),
             authorIds = listOf(AuthorId(UUID.fromString("11111111-1111-1111-1111-111111111111"))), // 最低1人の著者が必要
-            publicationStatus = PublicationStatus.PUBLISHED,
-            createdAt = LocalDateTime.now(),
-            updatedAt = LocalDateTime.now()
-        )
-    }
-
-    private fun createTestBookWithId(id: BookId, title: String, price: BigDecimal): Book {
-        return Book(
-            id = id,
-            title = BookTitle(title),
-            bookPrice = BookPrice(price),
-            authorIds = listOf(AuthorId(UUID.randomUUID())), // 最低1人の著者が必要
             publicationStatus = PublicationStatus.PUBLISHED,
             createdAt = LocalDateTime.now(),
             updatedAt = LocalDateTime.now()

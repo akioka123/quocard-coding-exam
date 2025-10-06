@@ -43,7 +43,7 @@ class BookController(
      * @throws IllegalArgumentException リクエストパラメータが不正な場合
      * @throws DataAccessException データベースアクセスでエラーが発生した場合
      */
-    @PostMapping("/")
+    @PostMapping("")
     fun createBook(
         @RequestBody request: CreateBookRequest
     ): ResponseEntity<SuccessResponse<BookCreateResponse>> {

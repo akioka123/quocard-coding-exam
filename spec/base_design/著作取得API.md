@@ -1,6 +1,15 @@
+# 概要
+
+著者IDに関連する書籍情報をすべて取得する。
+
 # INPUT
 
-## 検索条件
+## URI
+
+POST
+/api/books/get?authorId=
+
+## クエリパラメータ
 
 - 著者ID
 

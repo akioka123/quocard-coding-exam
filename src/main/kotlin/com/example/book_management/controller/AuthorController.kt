@@ -44,7 +44,7 @@ class AuthorController(
      * @throws IllegalArgumentException リクエストパラメータが不正な場合
      * @throws DataAccessException データベースアクセスでエラーが発生した場合
      */
-    @PostMapping("/")
+    @PostMapping("")
     fun createAuthor(
         @RequestBody request: CreateAuthorRequest
     ): ResponseEntity<SuccessResponse<AuthorCreateResponse>> {

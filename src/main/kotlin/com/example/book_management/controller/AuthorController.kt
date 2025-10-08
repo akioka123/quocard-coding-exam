@@ -98,7 +98,7 @@ class AuthorController(
             LocalDateTime.now(),
             LocalDateTime.now()
         )
-        authorService.update(updatedAuthor, request.bookIds)
+        authorService.update(updatedAuthor)
 
         val response = SuccessResponse(
             statusCode = HttpStatus.OK,

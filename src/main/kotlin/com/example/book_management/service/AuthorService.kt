@@ -45,14 +45,13 @@ class AuthorService(
      * @throws OptimisticLockingFailureException 楽観排他制御エラーが発生した場合
      */
     @Transactional
-    fun update(author: Author, bookIds: List<BookId>) {
+    fun update(author: Author) {
         val existingAuthor = authorDomainService.validateAuthorExists(author)
 
         val updatedRows = authorRepo.update(
             author.id,
             author.name,
             author.birthDate,
-            bookIds,
             existingAuthor.updatedAt
         )
 

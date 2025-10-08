@@ -122,7 +122,6 @@ class AuthorServiceTest {
             // Given
             val author = createTestAuthor()
             val existingAuthor = createTestAuthorWithUpdatedAt()
-            val bookIds = createTestBooks().map { it.id }
 
             every { authorDomainService.validateAuthorExists(author) } returns existingAuthor
             every { 
@@ -130,13 +129,12 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    bookIds,
                     existingAuthor.updatedAt
                 ) 
             } returns 1
 
             // When
-            authorService.update(author, bookIds)
+            authorService.update(author)
 
             // Then
             verify { authorDomainService.validateAuthorExists(author) }
@@ -145,7 +143,6 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    bookIds,
                     existingAuthor.updatedAt
                 ) 
             }
@@ -156,18 +153,17 @@ class AuthorServiceTest {
         fun update_authorNotFound() {
             // Given
             val author = createTestAuthor()
-            val bookIds = createTestBooks().map { it.id }
             val errorMessage = "著者が存在しません: ${author.id.value}"
 
             every { authorDomainService.validateAuthorExists(author) } throws IllegalArgumentException(errorMessage)
 
             // When & Then
-            assertThatThrownBy { authorService.update(author, bookIds) }
+            assertThatThrownBy { authorService.update(author) }
                 .isInstanceOf(IllegalArgumentException::class.java)
                 .hasMessage(errorMessage)
 
             verify { authorDomainService.validateAuthorExists(author) }
-            verify(exactly = 0) { authorRepo.update(any(), any(), any(), any(), any()) }
+            verify(exactly = 0) { authorRepo.update(any(), any(), any(), any()) }
         }
 
         @Test
@@ -176,7 +172,6 @@ class AuthorServiceTest {
             // Given
             val author = createTestAuthor()
             val existingAuthor = createTestAuthorWithUpdatedAt()
-            val bookIds = createTestBooks().map { it.id }
 
             every { authorDomainService.validateAuthorExists(author) } returns existingAuthor
             every { 
@@ -184,13 +179,12 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    bookIds,
                     existingAuthor.updatedAt
                 ) 
             } returns 0
 
             // When & Then
-            assertThatThrownBy { authorService.update(author, bookIds) }
+            assertThatThrownBy { authorService.update(author) }
                 .isInstanceOf(OptimisticLockingFailureException::class.java)
                 .hasMessage("楽観排他制御エラー: 他のユーザーによって更新されています")
 
@@ -200,7 +194,6 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    bookIds,
                     existingAuthor.updatedAt
                 ) 
             }
@@ -212,7 +205,6 @@ class AuthorServiceTest {
             // Given
             val author = createTestAuthor()
             val existingAuthor = createTestAuthorWithUpdatedAt()
-            val bookIds = createTestBooks().map { it.id }
 
             every { authorDomainService.validateAuthorExists(author) } returns existingAuthor
             every { 
@@ -220,13 +212,12 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    bookIds,
                     existingAuthor.updatedAt
                 ) 
             } returns 0
 
             // When & Then
-            assertThatThrownBy { authorService.update(author, bookIds) }
+            assertThatThrownBy { authorService.update(author) }
                 .isInstanceOf(OptimisticLockingFailureException::class.java)
                 .hasMessage("楽観排他制御エラー: 他のユーザーによって更新されています")
 
@@ -236,42 +227,6 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    bookIds,
-                    existingAuthor.updatedAt
-                ) 
-            }
-        }
-
-        @Test
-        @DisplayName("境界値：書籍リストが空の場合")
-        fun update_emptyBookIds() {
-            // Given
-            val author = createTestAuthor()
-            val existingAuthor = createTestAuthorWithUpdatedAt()
-            val emptyBookIds = emptyList<BookId>()
-
-            every { authorDomainService.validateAuthorExists(author) } returns existingAuthor
-            every { 
-                authorRepo.update(
-                    author.id, 
-                    author.name, 
-                    author.birthDate, 
-                    emptyBookIds,
-                    existingAuthor.updatedAt
-                ) 
-            } returns 1
-
-            // When
-            authorService.update(author, emptyBookIds)
-
-            // Then
-            verify { authorDomainService.validateAuthorExists(author) }
-            verify { 
-                authorRepo.update(
-                    author.id, 
-                    author.name, 
-                    author.birthDate, 
-                    emptyBookIds,
                     existingAuthor.updatedAt
                 ) 
             }
@@ -283,7 +238,6 @@ class AuthorServiceTest {
             // Given
             val author = createTestAuthor()
             val existingAuthor = createTestAuthorWithUpdatedAt()
-            val multipleBookIds = createMultipleTestBooks().map { it.id }
 
             every { authorDomainService.validateAuthorExists(author) } returns existingAuthor
             every { 
@@ -291,13 +245,12 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    multipleBookIds,
                     existingAuthor.updatedAt
                 ) 
             } returns 1
 
             // When
-            authorService.update(author, multipleBookIds)
+            authorService.update(author)
 
             // Then
             verify { authorDomainService.validateAuthorExists(author) }
@@ -306,7 +259,6 @@ class AuthorServiceTest {
                     author.id, 
                     author.name, 
                     author.birthDate, 
-                    multipleBookIds,
                     existingAuthor.updatedAt
                 ) 
             }
@@ -340,7 +292,6 @@ class AuthorServiceTest {
             // Given
             val author = createTestAuthor()
             val existingAuthor = createTestAuthorWithUpdatedAt()
-            val bookIds = createTestBooks().map { it.id }
 
             every { authorDomainService.validateAuthorExists(author) } returns existingAuthor
             every {
@@ -348,13 +299,12 @@ class AuthorServiceTest {
                     author.id,
                     author.name,
                     author.birthDate,
-                    bookIds,
                     existingAuthor.updatedAt
                 )
             } throws RuntimeException("データベースエラー")
 
             // When & Then
-            assertThatThrownBy { authorService.update(author, bookIds) }
+            assertThatThrownBy { authorService.update(author) }
                 .isInstanceOf(RuntimeException::class.java)
                 .hasMessage("データベースエラー")
 
@@ -364,7 +314,6 @@ class AuthorServiceTest {
                     author.id,
                     author.name,
                     author.birthDate,
-                    bookIds,
                     existingAuthor.updatedAt
                 ) 
             }

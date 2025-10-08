@@ -35,7 +35,6 @@ interface AuthorRepository {
      * @param id 更新対象の著者ID
      * @param name 更新する著者名
      * @param birthDate 更新する生年月日
-     * @param bookIds 登録する書籍IDリスト
      * @param expectedUpdatedAt 期待される更新日時（楽観排他制御用）
      * @return 更新されたレコード数（0の場合は更新されていない）
      */
@@ -43,7 +42,6 @@ interface AuthorRepository {
         id: AuthorId,
         name: AuthorName,
         birthDate: BirthDate,
-        bookIds: List<BookId>,
         expectedUpdatedAt: LocalDateTime
     ): Int
 

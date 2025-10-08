@@ -60,7 +60,6 @@ class JooqAuthorRepository(private val dsl: DSLContext) : AuthorRepository {
      * @param id 更新対象の著者ID
      * @param name 更新する著者名
      * @param birthDate 更新する生年月日
-     * @param bookIds 書籍IDリスト
      * @param expectedUpdatedAt 期待される更新日時（楽観排他制御用）
      * @return 更新されたレコード数（0の場合は更新されていない）
      */
@@ -68,7 +67,6 @@ class JooqAuthorRepository(private val dsl: DSLContext) : AuthorRepository {
         id: AuthorId,
         name: AuthorName,
         birthDate: BirthDate,
-        bookIds: List<BookId>,
         expectedUpdatedAt: LocalDateTime
     ): Int {
         val updatedCount = dsl.update(AUTHORS)
@@ -78,27 +76,6 @@ class JooqAuthorRepository(private val dsl: DSLContext) : AuthorRepository {
             .where(AUTHORS.ID.eq(id.value))
             .and(AUTHORS.UPDATED_AT.eq(expectedUpdatedAt))
             .execute()
-
-        if (updatedCount <= 0) {
-            return updatedCount
-        }
-
-        dsl.deleteFrom(BOOK_AUTHORS)
-            .where(BOOK_AUTHORS.AUTHOR_ID.eq(id.value))
-            .execute()
-
-        if (bookIds.isNotEmpty()) {
-            val bookAuthorsEntity = bookIds.map {
-                row(it.value, id.value)
-            }
-
-            dsl.insertInto(
-                BOOK_AUTHORS,
-                BOOK_AUTHORS.BOOK_ID,
-                BOOK_AUTHORS.AUTHOR_ID
-            ).valuesOfRows(bookAuthorsEntity)
-                .execute()
-        }
 
         return updatedCount
     }

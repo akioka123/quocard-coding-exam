@@ -2,6 +2,7 @@ package com.example.book_management.controller
 
 import com.example.book_management.dto.author.AuthorId
 import com.example.book_management.dto.book.*
+import com.example.book_management.dto.response.BookByAuthorResponse
 import com.example.book_management.dto.response.BookCreateResponse
 import com.example.book_management.dto.response.BookUpdateResponse
 import com.example.book_management.dto.response.SuccessResponse
@@ -133,12 +134,20 @@ class BookController(
     @GetMapping("/get")
     fun findByAuthorId(
         @RequestParam("authorId") authorId: UUID
-    ): ResponseEntity<SuccessResponse<List<Book>>> {
+    ): ResponseEntity<SuccessResponse<List<BookByAuthorResponse>>> {
         val books = bookService.findByAuthorId(AuthorId(authorId))
 
         val response = SuccessResponse(
             statusCode = HttpStatus.OK,
-            data = books
+            data = books.map {
+                BookByAuthorResponse(
+                    it.id.value.toString(),
+                    it.title.value,
+                    it.bookPrice.value,
+                    it.publicationStatus.name,
+                    it.authorIds
+                )
+            }
         )
 
         return ResponseEntity.ok(response)

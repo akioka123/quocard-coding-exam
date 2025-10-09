@@ -1,0 +1,28 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/book_management?currentSchema=test
+    username: app_admin
+    password: Admin!!1234
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        use_sql_comments: true
+  
+  flyway:
+    enabled: true
+    schemas: test
+    locations: classpath:db/test-migrations
+    clean-disabled: false
+
+logging:
+  level:
+    org.jooq: DEBUG
+    org.springframework.jdbc: DEBUG
+    org.flywaydb: DEBUG
+    com.example.book_management.repository: DEBUG

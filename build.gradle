@@ -1,9 +1,18 @@
+import org.flywaydb.gradle.task.FlywayMigrateTask
+
+buildscript {
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:10.7.2")
+    }
+}
+
 plugins {
-	id 'org.jetbrains.kotlin.jvm' version '1.9.25'
-	id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
-	id 'org.springframework.boot' version '3.5.6'
-	id 'io.spring.dependency-management' version '1.1.7'
-	id 'org.jooq.jooq-codegen-gradle' version '3.19.26'
+    id 'org.jetbrains.kotlin.jvm' version '1.9.25'
+    id 'org.jetbrains.kotlin.plugin.spring' version '1.9.25'
+    id 'org.springframework.boot' version '3.5.6'
+    id 'io.spring.dependency-management' version '1.1.7'
+    id 'org.jooq.jooq-codegen-gradle' version '3.19.26'
+    id 'org.flywaydb.flyway' version '10.16.0'
 }
 
 group = 'com.example'
@@ -11,75 +20,95 @@ version = '0.0.1-SNAPSHOT'
 description = 'quocard coding exam'
 
 java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-jooq'
-	implementation 'org.flywaydb:flyway-core'
-	implementation 'org.flywaydb:flyway-database-postgresql'
-	implementation 'org.jetbrains.kotlin:kotlin-reflect'
-	developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
-	runtimeOnly 'org.postgresql:postgresql'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-jooq'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.jetbrains.kotlin:kotlin-reflect'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    runtimeOnly 'org.postgresql:postgresql'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.jetbrains.kotlin:kotlin-test-junit5'
+    testImplementation "io.mockk:mockk:1.14.5"
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    jooqCodegen 'org.postgresql:postgresql'
 }
 
 jooq {
-	configuration {
+    configuration {
 
-  // Configure the database connection here
-  jdbc {
-    driver = "oracle.jdbc.OracleDriver"
-    url = "jdbc:oracle:thin:@[your jdbc connection parameters]"
-    user = "[your database user]"
-    password = "[your database password]"
+        // Configure the database connection here
+        jdbc {
+            driver = "org.postgresql.Driver"
+            url = "jdbc:postgresql://localhost:5432/book_management"
+            user = "app_admin"
+            password = "Admin!!1234"
+        }
 
-    // You can also pass user/password and other JDBC properties in the optional properties tag:
-    properties {
-      property {
-        key = "user"
-        value = "[db-user]"
-      }
-      property {
-        key = "password"
-        value = "[db-password]"
-      }
+        generator {
+            name = "org.jooq.codegen.KotlinGenerator"
+            database {
+                name = "org.jooq.meta.postgres.PostgresDatabase"
+
+                includes = ".*"
+
+                excludes = ""
+
+                inputSchema = "dev"
+            }
+
+            generate {}
+            target {
+                packageName = "com.example.book_management"
+                directory = "build/generated/sources/jooq"
+            }
+        }
     }
-  }
-  generator {
-    database {
-      name = "org.jooq.meta.postgresql.PostgreSQLDatabase"
-
-      includes = ".*"
-
-      excludes = ""
-
-      inputSchema = "public"
-    }
-
-    generate {}
-    target {
-      packageName = "com.example.book_management"
-      directory = "src/main/java/com/example/book_management"
-    }
-  }
 }
+
+sourceSets {
+    main { kotlin.srcDirs += "build/generated/sources/jooq" }
+}
+
+flyway {
+    driver = 'org.postgresql.Driver'
+    url = "jdbc:postgresql://localhost:5432/book_management"
+    user = "app_admin"
+    password = "Admin!!1234"
+    schemas = ['dev']
+    locations = ['classpath:db/migrations']
+    cleanDisabled = false
 }
 
 kotlin {
-	compilerOptions {
-		freeCompilerArgs.addAll '-Xjsr305=strict'
-	}
+    compilerOptions {
+        freeCompilerArgs.addAll '-Xjsr305=strict'
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+    dependsOn 'flywayTestMigrate'
+}
+
+// テスト用Flywayマイグレーションタスク
+tasks.register('flywayTestMigrate', FlywayMigrateTask) {
+    driver = 'org.postgresql.Driver'
+    url = "jdbc:postgresql://localhost:5432/book_management"
+    user = "app_admin"
+    password = "Admin!!1234"
+    schemas = ['test']
+    locations = ['classpath:db/test-migrations']
+    cleanDisabled = false
 }

@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/book_management
+    username: app_admin
+    password: Admin!!1234
+    driverClassName: org.postgresql.Driver
+  jooq:
+    sqlDialect: POSTGRES
+  docker:
+    compose:
+      enabled: false
+
+server:
+  port: 8080
